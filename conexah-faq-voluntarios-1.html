@@ -1,0 +1,2151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Apoio · Voluntários · Conexa H 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── TELA DE SENHA ── */
+  #lockScreen {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(160deg, #1A0404 0%, #6B0F0F 50%, #C42020 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 32px 24px;
+    overflow: hidden;
+  }
+  #lockScreen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(200,168,75,0.25) 1.5px, transparent 1.5px);
+    background-size: 14px 14px;
+    pointer-events: none;
+  }
+  #lockScreen::after {
+    content: '';
+    position: absolute;
+    right: -60px; bottom: -60px;
+    width: 260px; height: 130px;
+    border: 20px solid rgba(200,168,75,0.18);
+    border-radius: 50%;
+    transform: rotate(-20deg);
+    pointer-events: none;
+  }
+  .lock-inner {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+  }
+  .lock-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .lock-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #FFFFFF;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .lock-title em {
+    color: #E0C96E;
+    font-style: normal;
+  }
+  .lock-rule {
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, #C8A84B, transparent);
+    margin: 12px auto 20px;
+    border-radius: 2px;
+  }
+  .lock-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 28px;
+    letter-spacing: 0.3px;
+  }
+  .lock-input-wrap {
+    background: rgba(255,255,255,0.10);
+    border: 1.5px solid rgba(200,168,75,0.35);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .lock-input-wrap:focus-within {
+    border-color: #C8A84B;
+    background: rgba(255,255,255,0.14);
+  }
+  .lock-input-wrap span { font-size: 18px; margin-right: 10px; }
+  #passwordInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: #FFFFFF;
+    padding: 14px 0;
+    letter-spacing: 2px;
+  }
+  #passwordInput::placeholder {
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.5px;
+    font-size: 14px;
+  }
+  #togglePwd {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    color: rgba(255,255,255,0.5);
+  }
+  #lockBtn {
+    width: 100%;
+    background: #C8A84B;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #1A0404;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.1s;
+    margin-bottom: 14px;
+  }
+  #lockBtn:hover { background: #E0C96E; }
+  #lockBtn:active { transform: scale(0.98); }
+  #lockError {
+    color: #FFB3B3;
+    font-size: 13px;
+    display: none;
+    margin-top: 4px;
+  }
+  .lock-badge {
+    display: inline-block;
+    background: rgba(200,168,75,0.18);
+    border: 1px solid rgba(200,168,75,0.40);
+    color: #E0C96E;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  /* conteúdo principal oculto até autenticar */
+  #appContent { display: none; }
+</style>
+  :root {
+    --vermelho:        #9B1515;
+    --vermelho-vivo:   #C42020;
+    --vermelho-escuro: #2A0808;
+    --vermelho-medio:  #6B0F0F;
+    --dourado:         #C8A84B;
+    --dourado-claro:   #E0C96E;
+    --dourado-suave:   #F0DFA0;
+    --fundo:           #F5F0EB;
+    --fundo-card:      #FFFFFF;
+    --fundo-medio:     #EDE8E2;
+    --cinza:           #9A9A9A;
+    --cinza-escuro:    #4A4A4A;
+    --texto:           #1A0A0A;
+    --branco:          #FFFFFF;
+    --sombra:          0 2px 10px rgba(43,8,8,0.10);
+    --sombra-hover:    0 6px 22px rgba(43,8,8,0.18);
+    --radius:          10px;
+    --radius-sm:       7px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--vermelho-escuro);
+    color: var(--branco);
+    padding: 0 0 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* faixa superior com degradê vermelho */
+  .header-top {
+    background: linear-gradient(160deg, #1A0404 0%, #6B0F0F 40%, #C42020 100%);
+    padding: 26px 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* padrão halftone SVG inline como background */
+  .header-top::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(200,168,75,0.28) 1.5px, transparent 1.5px);
+    background-size: 14px 14px;
+    background-position: 0 0;
+    pointer-events: none;
+  }
+
+  /* anel dourado decorativo — referência ao elemento elipse da peça */
+  .header-top::after {
+    content: '';
+    position: absolute;
+    right: -60px;
+    bottom: -70px;
+    width: 220px;
+    height: 110px;
+    border: 18px solid rgba(200,168,75,0.22);
+    border-radius: 50%;
+    transform: rotate(-20deg);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(200,168,75,0.18);
+    border: 1px solid rgba(200,168,75,0.45);
+    color: var(--dourado-claro);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 3px;
+    margin-bottom: 12px;
+  }
+
+  header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(28px, 7vw, 42px);
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--branco);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  header h1 em {
+    color: var(--dourado-claro);
+    font-style: normal;
+  }
+
+  /* linha dourada fina abaixo do título */
+  .header-rule {
+    width: 48px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--dourado), transparent);
+    margin: 10px 0 8px;
+    border-radius: 2px;
+  }
+
+  .header-sub {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.60);
+    letter-spacing: 0.3px;
+  }
+
+  /* faixa de data abaixo do header-top */
+  .header-datebar {
+    background: var(--dourado);
+    padding: 7px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .header-datebar span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--vermelho-escuro);
+  }
+  .header-datebar .sep { color: rgba(42,8,8,0.4); font-size: 10px; }
+
+  /* ── BUSCA ── */
+  .search-bar {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px 18px 0;
+    transform: none;
+  }
+  .search-wrap {
+    background: var(--branco);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(43,8,8,0.20);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .search-wrap:focus-within { border-color: var(--dourado); }
+  .search-icon { font-size: 17px; flex-shrink: 0; }
+  #searchInput {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    color: var(--texto);
+    background: transparent;
+  }
+  #searchInput::placeholder { color: var(--cinza); }
+  #clearSearch {
+    background: var(--fundo-medio);
+    border: none;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--cinza-escuro);
+    cursor: pointer;
+    display: none;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+  .search-hint {
+    font-size: 11.5px;
+    color: var(--cinza);
+    margin-top: 7px;
+    padding: 0 4px;
+  }
+
+  /* ── CONTAGEM DE RESULTADOS ── */
+  .results-count {
+    max-width: 720px;
+    margin: 0 auto 8px;
+    padding: 0 18px;
+    font-size: 13px;
+    color: var(--cinza-escuro);
+    display: none;
+  }
+  .results-count strong { color: var(--vermelho-vivo); }
+
+  /* ── FILTROS ── */
+  .filters-section {
+    max-width: 720px;
+    margin: 0 auto 20px;
+    padding: 0 18px;
+  }
+  .filters-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--cinza);
+    margin-bottom: 10px;
+  }
+  .filters-scroll {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .filters-scroll::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    flex-shrink: 0;
+    background: var(--branco);
+    border: 1.5px solid var(--fundo-medio);
+    border-radius: 4px;
+    padding: 5px 13px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--cinza-escuro);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .filter-btn:hover {
+    border-color: var(--vermelho-vivo);
+    color: var(--vermelho-vivo);
+    background: #FFF5F5;
+  }
+  .filter-btn.active {
+    background: var(--vermelho-vivo);
+    border-color: var(--vermelho-vivo);
+    color: var(--branco);
+  }
+
+  /* ── RESPOSTAS RÁPIDAS ── */
+  .quick-section {
+    max-width: 720px;
+    margin: 0 auto 24px;
+    padding: 0 18px;
+  }
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cinza);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--fundo-medio), transparent);
+  }
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 9px;
+  }
+  .quick-card {
+    background: var(--branco);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+    border-left: 3px solid var(--dourado);
+    box-shadow: var(--sombra);
+    transition: box-shadow 0.18s, transform 0.18s;
+    position: relative;
+    overflow: hidden;
+  }
+  /* mini halftone nos cards rápidos */
+  .quick-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 60px; height: 60px;
+    background-image: radial-gradient(circle, rgba(200,168,75,0.18) 1px, transparent 1px);
+    background-size: 7px 7px;
+    border-radius: 0 var(--radius-sm) 0 0;
+    pointer-events: none;
+  }
+  .quick-card:hover { box-shadow: var(--sombra-hover); transform: translateY(-1px); }
+  .quick-card .qc-icon { font-size: 18px; margin-bottom: 5px; }
+  .quick-card .qc-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--vermelho-medio);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .quick-card .qc-answer {
+    font-size: 12px;
+    color: var(--cinza-escuro);
+    line-height: 1.4;
+  }
+
+  /* ── CATEGORIAS E FAQ ── */
+  .main-content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 18px 48px;
+  }
+
+  .category-block {
+    margin-bottom: 28px;
+  }
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--fundo-medio);
+  }
+  .cat-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho-vivo));
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(200,168,75,0.25) 1px, transparent 1px);
+    background-size: 6px 6px;
+  }
+  .cat-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--vermelho-escuro);
+  }
+  .cat-count {
+    margin-left: auto;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--cinza);
+    background: var(--fundo-medio);
+    padding: 2px 9px;
+    border-radius: 3px;
+  }
+
+  /* ── ACCORDION ── */
+  .faq-item {
+    background: var(--branco);
+    border-radius: var(--radius-sm);
+    margin-bottom: 5px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: box-shadow 0.18s;
+    border-left: 2px solid transparent;
+  }
+  .faq-item:hover {
+    box-shadow: var(--sombra);
+    border-left-color: var(--dourado);
+  }
+  .faq-item.hidden { display: none; }
+
+  .faq-question {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 13px 15px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--texto);
+    line-height: 1.4;
+    transition: background 0.15s;
+  }
+  .faq-question:hover { background: #FDF5F5; }
+  .faq-question.open {
+    background: #FDF5F5;
+    color: var(--vermelho-vivo);
+    border-left: none;
+  }
+  .faq-chevron {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--cinza);
+    transition: transform 0.25s;
+    padding-top: 2px;
+  }
+  .faq-question.open .faq-chevron {
+    transform: rotate(180deg);
+    color: var(--vermelho-vivo);
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .faq-answer-inner {
+    padding: 12px 15px 14px;
+    font-size: 13.5px;
+    color: var(--cinza-escuro);
+    line-height: 1.65;
+    border-top: 1px solid var(--fundo-medio);
+  }
+  .faq-answer-inner strong { color: var(--vermelho-medio); }
+  .faq-answer-inner ul { padding-left: 16px; margin-top: 6px; }
+  .faq-answer-inner ul li { margin-bottom: 4px; }
+  .faq-answer-inner .tag {
+    display: inline-block;
+    background: var(--fundo-medio);
+    color: var(--cinza-escuro);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-top: 8px;
+    margin-right: 4px;
+  }
+  .alert-box {
+    background: #FFFBEE;
+    border-left: 3px solid var(--dourado);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    margin-top: 10px;
+    font-size: 13px;
+  }
+  .alert-box.danger {
+    background: #FFF4F4;
+    border-color: var(--vermelho-vivo);
+    color: #7A0A0A;
+  }
+
+  /* ── BLOCO INTERNO (VOLUNTÁRIOS) ── */
+  .volunteer-block {
+    border-radius: var(--radius);
+    padding: 0;
+    margin-bottom: 28px;
+    color: var(--branco);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(43,8,8,0.25);
+  }
+
+  /* cabeçalho do bloco com halftone */
+  .vol-header {
+    background: linear-gradient(135deg, #1A0404 0%, #6B0F0F 50%, #9B1515 100%);
+    padding: 18px 20px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .vol-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(200,168,75,0.30) 1.5px, transparent 1.5px);
+    background-size: 12px 12px;
+    pointer-events: none;
+  }
+  /* anel decorativo no canto */
+  .vol-header::after {
+    content: '';
+    position: absolute;
+    right: -30px; bottom: -40px;
+    width: 120px; height: 60px;
+    border: 12px solid rgba(200,168,75,0.25);
+    border-radius: 50%;
+    transform: rotate(-15deg);
+  }
+  .vol-header h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--dourado-claro);
+    position: relative;
+  }
+  .vol-header p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 3px;
+    position: relative;
+  }
+
+  /* corpo dos procedimentos */
+  .vol-body {
+    background: #1E0606;
+    padding: 14px 16px;
+  }
+
+  .proc-item {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-sm);
+    margin-bottom: 7px;
+    overflow: hidden;
+  }
+  .proc-question {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 11px 14px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.88);
+    transition: background 0.15s;
+  }
+  .proc-question:hover { background: rgba(255,255,255,0.05); }
+  .proc-question .proc-icon { font-size: 14px; flex-shrink: 0; }
+  .proc-chevron {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--dourado-claro);
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .proc-question.open .proc-chevron { transform: rotate(180deg); }
+  .proc-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .proc-answer-inner {
+    padding: 10px 14px 13px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.65;
+    border-top: 1px solid rgba(255,255,255,0.10);
+  }
+  .proc-answer-inner strong { color: var(--dourado-suave); }
+  .proc-answer-inner ul { padding-left: 15px; margin-top: 5px; }
+  .proc-answer-inner li { margin-bottom: 3px; }
+
+  /* ── NO RESULTS ── */
+  .no-results {
+    text-align: center;
+    padding: 44px 20px;
+    display: none;
+  }
+  .no-results .nr-icon { font-size: 38px; margin-bottom: 12px; }
+  .no-results h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--vermelho-vivo);
+    margin-bottom: 6px;
+  }
+  .no-results p { font-size: 13px; color: var(--cinza); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--vermelho-escuro);
+    color: rgba(255,255,255,0.45);
+    text-align: center;
+    padding: 16px 20px;
+    font-size: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  footer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(200,168,75,0.12) 1px, transparent 1px);
+    background-size: 12px 12px;
+    pointer-events: none;
+  }
+  footer span { color: var(--dourado-claro); position: relative; }
+  footer p { position: relative; }
+
+  /* ── HIGHLIGHT ── */
+  mark {
+    background: rgba(200,168,75,0.35);
+    color: var(--texto);
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  @media (max-width: 480px) {
+    .quick-grid { grid-template-columns: 1fr 1fr; }
+    .header-top { padding: 20px 16px 18px; }
+    .search-bar, .filters-section, .quick-section, .main-content { padding: 0 13px; }
+    .results-count { padding: 0 13px; }
+    header h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TELA DE SENHA -->
+<div id="lockScreen">
+  <div class="lock-inner">
+    <span class="lock-badge">🔒 Acesso restrito</span>
+    <span class="lock-icon">🎫</span>
+    <div class="lock-title">Central de Apoio<br><em>Conexa H 2026</em></div>
+    <div class="lock-rule"></div>
+    <p class="lock-sub">Insira a senha para acessar a central dos voluntários</p>
+    <div class="lock-input-wrap">
+      <span>🔑</span>
+      <input type="password" id="passwordInput" placeholder="Digite a senha" autocomplete="off">
+      <button id="togglePwd" onclick="togglePwd()" type="button">👁️</button>
+    </div>
+    <p id="lockError">Senha incorreta. Tente novamente.</p>
+    <button id="lockBtn" onclick="checkPassword()">Entrar</button>
+  </div>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<div id="appContent">
+<header>
+  <div class="header-top">
+    <div class="header-inner">
+      <div class="header-badge">🔒 Uso interno · Voluntários</div>
+      <h1>Central de Apoio<br><em>Conexa H 2026</em></h1>
+      <div class="header-rule"></div>
+      <p class="header-sub">Respostas rápidas para orientar o público durante o evento</p>
+    </div>
+  </div>
+  <div class="header-datebar">
+    <span>17 Jun</span>
+    <span class="sep">◆</span>
+    <span>Centro de Convenções</span>
+    <span class="sep">◆</span>
+    <span>Vitória · ES</span>
+  </div>
+</header>
+
+<!-- BUSCA -->
+<div class="search-bar">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="search" id="searchInput" placeholder="Buscar por dúvida, palavra-chave ou categoria..." autocomplete="off">
+    <button id="clearSearch" onclick="clearSearch()">Limpar</button>
+  </div>
+  <p class="search-hint">Busca em perguntas, respostas e categorias</p>
+</div>
+
+<!-- CONTAGEM DE RESULTADOS -->
+<div class="results-count" id="resultsCount"></div>
+
+<!-- FILTROS -->
+<div class="filters-section" id="filtersSection">
+  <p class="filters-label">Filtrar por área</p>
+  <div class="filters-scroll">
+    <button class="filter-btn active" data-cat="all" onclick="filterCat(this)">Todas</button>
+    <button class="filter-btn" data-cat="credenciamento" onclick="filterCat(this)">🎫 Credenciamento</button>
+    <button class="filter-btn" data-cat="ingressos" onclick="filterCat(this)">🎟️ Ingressos</button>
+    <button class="filter-btn" data-cat="programacao" onclick="filterCat(this)">📅 Programação</button>
+    <button class="filter-btn" data-cat="localizacao" onclick="filterCat(this)">📍 Localização</button>
+    <button class="filter-btn" data-cat="acessibilidade" onclick="filterCat(this)">♿ Acessibilidade</button>
+    <button class="filter-btn" data-cat="expo" onclick="filterCat(this)">🏢 Expo</button>
+    <button class="filter-btn" data-cat="palestrantes" onclick="filterCat(this)">🎤 Palestrantes</button>
+    <button class="filter-btn" data-cat="expositores" onclick="filterCat(this)">🏬 Expositores</button>
+    <button class="filter-btn" data-cat="patrocinadores" onclick="filterCat(this)">🤝 Patrocinadores</button>
+    <button class="filter-btn" data-cat="alimentacao" onclick="filterCat(this)">🍽️ Alimentação</button>
+    <button class="filter-btn" data-cat="achados" onclick="filterCat(this)">🔍 Achados e Perdidos</button>
+    <button class="filter-btn" data-cat="emergencias" onclick="filterCat(this)">🚨 Emergências</button>
+    <button class="filter-btn" data-cat="atendimento" onclick="filterCat(this)">🙋 Atendimento</button>
+  </div>
+</div>
+
+<!-- RESPOSTAS RÁPIDAS -->
+<div class="quick-section" id="quickSection">
+  <p class="section-label">⚡ Respostas rápidas</p>
+  <div class="quick-grid">
+    <div class="quick-card">
+      <div class="qc-icon">⏰</div>
+      <div class="qc-title">Credenciamento congressistas</div>
+      <div class="qc-answer">A partir das <strong>07h30</strong>.</div>
+    </div>
+    <div class="quick-card">
+      <div class="qc-icon">🏛️</div>
+      <div class="qc-title">Abertura oficial</div>
+      <div class="qc-answer">Abertura do congresso às <strong>08h30</strong>.</div>
+    </div>
+    <div class="quick-card">
+      <div class="qc-icon">🎪</div>
+      <div class="qc-title">Credenciamento Expo</div>
+      <div class="qc-answer">Visitantes da Expo a partir das <strong>09h00</strong>.</div>
+    </div>
+    <div class="quick-card">
+      <div class="qc-icon">📱</div>
+      <div class="qc-title">Precisa imprimir ingresso?</div>
+      <div class="qc-answer"><strong>Não.</strong> Basta mostrar a inscrição no celular.</div>
+    </div>
+    <div class="quick-card">
+      <div class="qc-icon">📍</div>
+      <div class="qc-title">Endereço do evento</div>
+      <div class="qc-answer">Rua Constante Sodré, 157 – Santa Lúcia, Vitória/ES.</div>
+    </div>
+    <div class="quick-card">
+      <div class="qc-icon">🚗</div>
+      <div class="qc-title">Estacionamento</div>
+      <div class="qc-answer"><strong>Não há</strong> estacionamento próprio. Há rotativos nas proximidades.</div>
+    </div>
+    <div class="quick-card">
+      <div class="qc-icon">📞</div>
+      <div class="qc-title">WhatsApp de suporte</div>
+      <div class="qc-answer"><strong>(27) 99271-1043</strong> — e-mail perdido ou dúvidas de inscrição.</div>
+    </div>
+    <div class="quick-card">
+      <div class="qc-icon">🙋</div>
+      <div class="qc-title">Problema ou situação especial</div>
+      <div class="qc-answer">Encaminhe ao <strong>balcão de atendimento</strong>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="main-content" id="mainContent">
+
+  <!-- PROCEDIMENTOS INTERNOS (VOLUNTÁRIOS) -->
+  <div class="volunteer-block" id="volBlock" data-cat="voluntarios">
+    <div class="vol-header">
+      <h2>🔒 Procedimentos Internos · Voluntários</h2>
+      <p>Área restrita — não compartilhe com o público</p>
+    </div>
+    <div class="vol-body">
+    <div class="proc-item" data-search="comunicação interna rádio walkie talkie escala turno posto posição voluntário">
+      <button class="proc-question" onclick="toggleProc(this)">
+        <span class="proc-icon">📻</span> Comunicação interna entre voluntários
+        <span class="proc-chevron">▼</span>
+      </button>
+      <div class="proc-answer">
+        <div class="proc-answer-inner">
+          Toda a comunicação da equipe de voluntários ocorre pelos canais definidos pela coordenação antes do evento. <strong>Não compartilhe informações operacionais com o público</strong> — apenas com outros voluntários e coordenadores. Em caso de dúvida, acione a coordenação pelo canal oficial.
+        </div>
+      </div>
+    </div>
+
+    <div class="proc-item" data-search="escala turno horário intervalo folga pausa voluntário">
+      <button class="proc-question" onclick="toggleProc(this)">
+        <span class="proc-icon">🗓️</span> Escalas e turnos dos voluntários
+        <span class="proc-chevron">▼</span>
+      </button>
+      <div class="proc-answer">
+        <div class="proc-answer-inner">
+          As escalas foram definidas previamente. <strong>Não abandone seu posto</strong> antes de sinalizar à coordenação. Intervalos devem ser comunicados antecipadamente para garantir cobertura. Em caso de imprevisto, avise imediatamente o coordenador de área.
+        </div>
+      </div>
+    </div>
+
+    <div class="proc-item" data-search="postura linguagem comportamento público atendimento tom voluntário">
+      <button class="proc-question" onclick="toggleProc(this)">
+        <span class="proc-icon">💬</span> Postura e linguagem no atendimento ao público
+        <span class="proc-chevron">▼</span>
+      </button>
+      <div class="proc-answer">
+        <div class="proc-answer-inner">
+          <strong>Seja sempre cordial, objetivo e seguro nas informações.</strong><br><br>
+          <ul>
+            <li>Não demonstre insegurança ao público — diga "vou verificar" se necessário</li>
+            <li>Não invente informações: busque sempre a fonte correta</li>
+            <li>Nunca divulgue telefone de organizadores ou staff</li>
+            <li>Encaminhe situações complexas ao balcão de atendimento</li>
+            <li>Mantenha o uniforme/colete de voluntário visível o tempo todo</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="proc-item" data-search="situação especial problema incidente conflito segurança acionar coordenação voluntário">
+      <button class="proc-question" onclick="toggleProc(this)">
+        <span class="proc-icon">⚠️</span> Situações especiais e imprevistos
+        <span class="proc-chevron">▼</span>
+      </button>
+      <div class="proc-answer">
+        <div class="proc-answer-inner">
+          Qualquer situação que fuja do rotineiro deve ser <strong>escalada imediatamente</strong>:
+          <ul>
+            <li>Conflitos ou desentendimentos com participantes</li>
+            <li>Pessoas passando mal ou em situação de emergência</li>
+            <li>Problemas técnicos nos espaços</li>
+            <li>Objetos abandonados ou suspeitos</li>
+            <li>Situações de acessibilidade que exijam apoio especializado</li>
+          </ul>
+          <strong>Acione a coordenação</strong> pelo canal interno. Não tente resolver situações de risco sozinho.
+        </div>
+      </div>
+    </div>
+
+    <div class="proc-item" data-search="credenciamento acesso pulseira crachá erro sistema problema voluntário">
+      <button class="proc-question" onclick="toggleProc(this)">
+        <span class="proc-icon">🎫</span> Problemas no credenciamento: como agir
+        <span class="proc-chevron">▼</span>
+      </button>
+      <div class="proc-answer">
+        <div class="proc-answer-inner">
+          Se a inscrição não constar no sistema ou houver erro:
+          <ul>
+            <li>Peça ao participante que aguarde brevemente</li>
+            <li>Acione o responsável técnico do credenciamento</li>
+            <li>Não libere acesso sem confirmação de inscrição válida</li>
+            <li>Se a fila crescer, avise a coordenação imediatamente</li>
+          </ul>
+          <strong>Não tome decisões unilaterais</strong> sobre liberação de acesso sem autorização.
+        </div>
+      </div>
+    </div>
+
+    <div class="proc-item" data-search="imprensa mídia fotógrafo jornalista câmera gravação autorização voluntário">
+      <button class="proc-question" onclick="toggleProc(this)">
+        <span class="proc-icon">📸</span> Imprensa e solicitações de câmera
+        <span class="proc-chevron">▼</span>
+      </button>
+      <div class="proc-answer">
+        <div class="proc-answer-inner">
+          Jornalistas e fotógrafos devem ter credencial específica de imprensa. Em caso de abordagem sem credencial, <strong>encaminhe ao balcão de atendimento</strong> para verificação. Não conceda entrevistas em nome da ABRH-ES ou do evento — direcione ao responsável pela comunicação.
+        </div>
+      </div>
+    </div>
+
+    <div class="proc-item" data-search="encerramento desmontagem saída final evento voluntário procedimento">
+      <button class="proc-question" onclick="toggleProc(this)">
+        <span class="proc-icon">🏁</span> Procedimentos de encerramento
+        <span class="proc-chevron">▼</span>
+      </button>
+      <div class="proc-answer">
+        <div class="proc-answer-inner">
+          Ao final do evento:
+          <ul>
+            <li>Aguarde liberação formal da coordenação antes de deixar o posto</li>
+            <li>Entregue qualquer material de apoio recebido (rádio, colete, tablet)</li>
+            <li>Objetos encontrados devem ser entregues ao balcão de atendimento</li>
+            <li>Participe do briefing de encerramento se convocado</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- vol-body -->
+  </div><!-- volunteer-block -->
+  <div class="no-results" id="noResults">
+    <div class="nr-icon">🔎</div>
+    <h3>Nenhum resultado encontrado</h3>
+    <p>Tente outros termos ou encaminhe a dúvida ao balcão de atendimento.</p>
+  </div>
+
+  <!-- ── CREDENCIAMENTO ── -->
+  <div class="category-block" data-cat="credenciamento" id="cat-credenciamento">
+    <div class="category-header">
+      <div class="cat-icon">🎫</div>
+      <span class="cat-name">Credenciamento</span>
+      <span class="cat-count" id="count-credenciamento"></span>
+    </div>
+
+    <div class="faq-item" data-cat="credenciamento" data-search="horário credenciamento congressistas que horas abre abertura 7h30 8h30">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>A que horas abre o credenciamento para congressistas?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O credenciamento para <strong>congressistas</strong> abre às <strong>07h30</strong>.<br>
+          A abertura oficial do congresso acontece às <strong>08h30</strong>.<br><br>
+          Oriente o participante a chegar com a inscrição já aberta no celular para agilizar o acesso.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="credenciamento" data-search="horário credenciamento visitantes expo fair que horas">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>E o credenciamento dos visitantes da Expo?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Visitantes da <strong>Expo Conexa H</strong> são credenciados a partir das <strong>09h00</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="credenciamento" data-search="imprimir ingresso bilhete comprovante ticket necessário obrigatorio">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>É necessário imprimir o ingresso?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Não.</strong> Não é necessário imprimir nada. O participante deve apresentar sua inscrição diretamente no aplicativo ou site do <strong>Já Credenciei</strong> — basta mostrar o comprovante na tela do celular.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="credenciamento" data-search="já credenciei plataforma como funciona onde inscrição sistema">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como o participante verifica a inscrição no Já Credenciei?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O participante deve acessar o site ou app do <strong>Já Credenciei (jacredenciei.com.br)</strong> com o e-mail utilizado na inscrição. O comprovante ficará disponível na conta. Em caso de problemas de acesso, <strong>encaminhe ao balcão de atendimento</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="credenciamento" data-search="diferença credencial tipo congressista visitante pulseira crachá acesso">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Qual a diferença entre os tipos de credencial?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Há dois perfis principais:
+          <ul>
+            <li><strong>Congressista:</strong> acesso ao congresso completo — palestras, painéis, auditórios, arenas e Expo.</li>
+            <li><strong>Visitante da Expo:</strong> acesso apenas à feira de negócios (Expo Conexa H). Não tem acesso ao congresso.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="credenciamento" data-search="perdeu crachá esqueceu credencial entrou sem badge segunda via">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O participante perdeu ou esqueceu o crachá. O que fazer?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Encaminhe ao <strong>balcão de atendimento</strong>. A equipe verificará a inscrição no sistema e tomará as providências necessárias para emissão de segunda via, conforme procedimento definido pela coordenação.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── INGRESSOS E INSCRIÇÕES ── -->
+  <div class="category-block" data-cat="ingressos" id="cat-ingressos">
+    <div class="category-header">
+      <div class="cat-icon">🎟️</div>
+      <span class="cat-name">Ingressos e Inscrições</span>
+      <span class="cat-count" id="count-ingressos"></span>
+    </div>
+
+    <div class="faq-item" data-cat="ingressos" data-search="comprar ingresso inscrição ainda dá tempo disponível vaga link site">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Ainda é possível se inscrever no evento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Sim.</strong> Os ingressos seguem disponíveis enquanto houver vagas. A compra pode ser realizada pelo link:<br><br>
+          <strong>jacredenciei.com.br/e/conexah26</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="ingressos" data-search="imprimir ingresso bilhete comprovante ticket necessário obrigatorio celular">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>É necessário imprimir o ingresso?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Não.</strong> Basta apresentar a inscrição no celular no momento do credenciamento. Não é preciso imprimir nada.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="ingressos" data-search="perdi email confirmação inscrição não recebi spam lixo eletrônico suporte whatsapp">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O participante perdeu o e-mail de confirmação. O que fazer?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Oriente o participante a verificar a <strong>caixa de spam, lixo eletrônico e promoções</strong> do e-mail. Caso não encontre, o suporte é pelo WhatsApp: <strong>(27) 99271-1043</strong>.
+          <div class="alert-box">
+            📱 WhatsApp de suporte: <strong>(27) 99271-1043</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="ingressos" data-search="como evitar fila credenciamento acesso rápido agilizar entrada já credenciei">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como evitar filas no credenciamento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Oriente o participante a chegar com a <strong>inscrição já aberta no Já Credenciei</strong> no celular. Isso agiliza o processo e reduz o tempo na entrada. Chegar com antecedência também ajuda.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="ingressos" data-search="reembolso cancelamento desistência ingresso devolução dinheiro">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O participante quer cancelar a inscrição ou pedir reembolso.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Questões de cancelamento e reembolso são tratadas diretamente com a organização. <strong>Não tente resolver ou garantir qualquer reembolso diretamente.</strong> Encaminhe ao <strong>balcão de atendimento</strong> para contato com a equipe responsável.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="ingressos" data-search="transferência cessão ingresso outra pessoa nome diferente">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O ingresso pode ser transferido para outra pessoa?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Encaminhe essa dúvida ao <strong>balcão de atendimento</strong> para verificação junto à equipe da organização. Não tome decisões sobre transferência de ingressos sem autorização.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="ingressos" data-search="nota fiscal cupom fiscal recibo comprovante pagamento empresa cnpj">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Preciso de nota fiscal / comprovante para empresa.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Encaminhe ao <strong>balcão de atendimento</strong>. Questões fiscais e financeiras são tratadas diretamente pela equipe administrativa da ABRH-ES.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── PROGRAMAÇÃO ── -->
+  <div class="category-block" data-cat="programacao" id="cat-programacao">
+    <div class="category-header">
+      <div class="cat-icon">📅</div>
+      <span class="cat-name">Programação</span>
+      <span class="cat-count" id="count-programacao"></span>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="programação onde ver consultar grade horário palestra arena auditório aplicativo seção">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde o participante pode ver a programação completa?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          A programação completa está disponível na <strong>seção Programação do aplicativo</strong> — horários, palestrantes e locais de cada atividade. Também pode ser consultada no site oficial e no Instagram da ABRH-ES.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="auditório principal onde fica localização programação principal acesso congressista">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde fica o auditório da programação principal?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          A localização está indicada no <strong>Mapa da Feira, disponível no aplicativo</strong>. Oriente o participante a consultá-lo. Lembre: o acesso à programação principal é <strong>exclusivo para congressistas credenciados</strong> — visitantes da Expo não entram.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="aplicativo app baixar onde download evento conexa">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como baixar o aplicativo do evento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Oriente o participante a buscar por <strong>"Conexa H"</strong> na App Store (iPhone) ou Google Play (Android). Qualquer dúvida sobre acesso ao app, encaminhe ao <strong>balcão de atendimento</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="palestra cancelada adiada mudou horário alteração programação">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Houve alteração ou cancelamento em alguma palestra?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Em caso de alterações, as informações oficiais são atualizadas no <strong>app</strong> e nas redes sociais da ABRH-ES. Se o participante relatar alguma alteração, consulte a coordenação antes de confirmar qualquer mudança. Nunca afirme algo sobre a grade sem confirmação.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="auditório arena qual palestra onde acontece espaço local sala">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O participante quer saber em qual espaço acontece determinada palestra.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Oriente o participante a verificar no <strong>aplicativo oficial</strong> — cada palestra está vinculada ao seu espaço. Caso não encontre, consulte o <strong>Mapa da Feira no app</strong> ou encaminhe ao balcão de atendimento.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="gravação acesso posterior conteúdo vídeo assistir depois online">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>As palestras serão gravadas? Posso assistir depois?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Não confirme informações sobre gravação sem verificar com a coordenação. Encaminhe essa dúvida ao <strong>balcão de atendimento</strong>, que poderá dar a resposta oficial sobre disponibilização de conteúdo pós-evento.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="sair retornar voltar entrar de novo saída reentrada credencial durante dia">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O participante pode sair e retornar ao evento durante o dia?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Sim.</strong> Após o credenciamento, o participante pode sair e retornar ao evento durante o dia normalmente.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="mentoria como participar horário local orientação inscrição">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como participar das mentorias?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          As informações sobre mentorias — horários, locais e orientações de participação — estão disponíveis na <strong>seção Mentoria do aplicativo</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="networking conversar conhecer pessoas interação profissionais onde quando">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde posso fazer networking durante o evento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O networking acontece ao longo de toda a programação, especialmente nos <strong>intervalos entre palestras</strong> e na <strong>Expo Conexa H</strong>, onde é possível interagir com participantes, palestrantes, patrocinadores, expositores e profissionais da área de gestão de pessoas.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="certificado participação como emitir pegar baixar onde após evento">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como obter o certificado de participação?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          As orientações para emissão do certificado estarão disponíveis na <strong>seção Certificado do aplicativo</strong> após o evento. Oriente o participante a aguardar e acessar o app depois.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="programacao" data-search="fotos oficiais evento onde ver acessar compartilhar você no conexa">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como acessar as fotos oficiais do evento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          As fotos estarão disponíveis na <strong>seção "Você no Conexa H"</strong> durante o evento e, posteriormente, na seção <strong>Fotos Oficiais</strong> do aplicativo. Para compartilhar as próprias fotos, as orientações também estão nessa seção.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── LOCALIZAÇÃO E ESTRUTURA ── -->
+  <div class="category-block" data-cat="localizacao" id="cat-localizacao">
+    <div class="category-header">
+      <div class="cat-icon">📍</div>
+      <span class="cat-name">Localização e Estrutura</span>
+      <span class="cat-count" id="count-localizacao"></span>
+    </div>
+
+    <div class="faq-item" data-cat="localizacao" data-search="mapa evento planta baixa onde fica espaços auditório área exposição aplicativo">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde encontro o mapa do evento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O mapa completo do Centro de Convenções — incluindo auditórios, área de exposição, espaços de apoio e demais ambientes — está disponível na <strong>seção Mapa da Feira do aplicativo</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="localizacao" data-search="onde fica centro de convenções vitória endereço local evento rua constante sodré santa lúcia">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde fica o Centro de Convenções de Vitória?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Rua Constante Sodré, 157 – Santa Lúcia, Vitória/ES.</strong><br>
+          Para chegar, oriente o participante a buscar no Google Maps por <strong>"Centro de Convenções de Vitória"</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="localizacao" data-search="estacionamento tem vaga carro onde estacionar rotativo particular proximidades antecedência">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Há estacionamento disponível?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>O Centro de Convenções não possui estacionamento próprio</strong> para congressistas e visitantes. Há opções de estacionamento rotativo e estacionamentos particulares nas proximidades. Recomende chegar com antecedência para maior comodidade.
+          <div class="alert-box">
+            💡 Dica: aplicativos como Uber ou 99 são uma boa alternativa para evitar problemas de estacionamento.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="localizacao" data-search="banheiro toalete sanitário adaptado onde fica localização sinalizado">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde ficam os banheiros?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Os banheiros estão <strong>sinalizados nas dependências do Centro de Convenções</strong>, incluindo banheiros adaptados. Em caso de dúvida, oriente o participante a procurar a equipe de apoio mais próxima.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="localizacao" data-search="wifi internet senha rede conexão banda larga">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Há Wi-Fi disponível para participantes?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Verifique com a coordenação se haverá Wi-Fi aberto para participantes e, em caso positivo, qual a senha oficial. <strong>Não confirme disponibilidade de Wi-Fi sem essa informação.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="localizacao" data-search="guarda volumes bagagem mala onde guardar pertences">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Há guarda-volumes no evento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Verifique com a coordenação se haverá esse serviço disponível. Encaminhe o participante ao <strong>balcão de atendimento</strong> para orientação sobre guarda de pertences.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ACESSIBILIDADE ── -->
+  <div class="category-block" data-cat="acessibilidade" id="cat-acessibilidade">
+    <div class="category-header">
+      <div class="cat-icon">♿</div>
+      <span class="cat-name">Acessibilidade</span>
+      <span class="cat-count" id="count-acessibilidade"></span>
+    </div>
+
+    <div class="faq-item" data-cat="acessibilidade" data-search="acessível cadeirante deficiência mobilidade entrada acesso rampa banheiro adaptado rota">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O evento é acessível para cadeirantes?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Sim.</strong> O Centro de Convenções de Vitória conta com:
+          <ul>
+            <li>Entradas acessíveis</li>
+            <li>Banheiros adaptados</li>
+            <li>Rotas de circulação acessíveis</li>
+            <li>Espaços reservados no auditório</li>
+            <li>Sinalização inclusiva</li>
+            <li>Equipe de apoio para orientação</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="acessibilidade" data-search="intérprete libras surdo sinais língua brasileira tradução programação principal arenas">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Haverá intérprete de Libras?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Sim.</strong> Haverá intérprete de Libras na <strong>programação principal e nas arenas</strong>. Para saber quais atividades contemplam interpretação, oriente o participante a consultar o aplicativo ou encaminhe ao <strong>balcão de atendimento</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="acessibilidade" data-search="dúvida acessibilidade especial apoio assistência necessidade">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O participante tem necessidade especial de acessibilidade. O que fazer?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Encaminhe diretamente ao <strong>balcão de atendimento do evento</strong>, que é o ponto oficial para suporte em questões de acessibilidade. Não tente resolver sozinho situações que requerem apoio especializado.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── EXPO CONEXA H ── -->
+  <div class="category-block" data-cat="expo" id="cat-expo">
+    <div class="category-header">
+      <div class="cat-icon">🏢</div>
+      <span class="cat-name">Expo Conexa H</span>
+      <span class="cat-count" id="count-expo"></span>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="expo o que é feira negócios o que tem como funciona visitante">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O que é a Expo Conexa H?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          A <strong>Expo Conexa H</strong> é a feira de negócios do evento, aberta tanto para congressistas quanto para visitantes. Conta com estandes de expositores e patrocinadores, ativações, experiências e espaços de networking.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="congressista pode entrar expo acesso aberto todos">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Congressistas podem entrar na Expo?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Sim.</strong> Congressistas têm acesso à Expo Conexa H incluído em sua credencial. Visitantes da Expo, por outro lado, <strong>não têm acesso</strong> ao congresso.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="visitante expo acesso congress palestra auditório pode entrar">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Visitante da Expo pode assistir às palestras do congresso?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Não.</strong> O acesso ao congresso (palestras, painéis, auditórios e arenas de conteúdo) é exclusivo para congressistas credenciados. O visitante da Expo tem acesso apenas à área da feira.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="horário expo funciona que horas abre fecha credenciamento visitante">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Qual o horário de funcionamento da Expo?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O credenciamento de visitantes da Expo começa às <strong>09h00</strong>. Para horário de encerramento, consulte a programação oficial no app ou confirme com a coordenação.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="empresa expositora como encontrar onde fica estande lista consultar aplicativo">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como encontrar uma empresa expositora?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Oriente o participante a acessar a <strong>seção Expositores no aplicativo</strong> — lá está a lista completa das empresas participantes da Expo Conexa H, com localização no mapa da feira.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="patrocinadores quais empresas patrocinam lista aplicativo seção">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como ver a lista de patrocinadores do evento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          A relação completa dos patrocinadores está disponível na <strong>seção Patrocinadores do aplicativo</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="gamificação game jogo pontos acumular atividades estandes interação conexa h game">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como funciona o Conexa H Game?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O <strong>Conexa H Game</strong> é a gamificação oficial do evento. O participante acumula pontos ao longo do congresso participando das atividades propostas, visitando estandes e realizando interações. A pontuação e a posição no ranking ficam na <strong>seção Ranking do aplicativo</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="stand estande ABRH onde fica associação benefícios associação">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde fica o stand da ABRH-ES?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O stand da ABRH-ES está identificado no <strong>Mapa da Feira no aplicativo</strong> e contará com equipe disponível para apresentar benefícios, iniciativas e oportunidades de associação.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="prêmio ser humano o que é reconhecimento projetos práticas excelência RH">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O que é o Prêmio Ser Humano?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O <strong>Prêmio Ser Humano</strong> é uma iniciativa da ABRH que reconhece projetos e práticas de excelência na gestão de pessoas. Mais informações estão disponíveis na <strong>seção Prêmio Ser Humano do aplicativo</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expo" data-search="outros eventos ABRH-ES agenda encontros próximos futuros iniciativas">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Como conhecer outros eventos da ABRH-ES?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          A agenda completa de eventos, encontros e iniciativas da ABRH-ES está disponível na <strong>seção Eventos ABRH-ES do aplicativo</strong>.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── PALESTRANTES ── -->
+  <div class="category-block" data-cat="palestrantes" id="cat-palestrantes">
+    <div class="category-header">
+      <div class="cat-icon">🎤</div>
+      <span class="cat-name">Palestrantes</span>
+      <span class="cat-count" id="count-palestrantes"></span>
+    </div>
+
+    <div class="faq-item" data-cat="palestrantes" data-search="palestrante contato falar conversar com como quero falar autógrafo foto">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O participante quer falar com algum palestrante. Como proceder?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Oriente o participante a aguardar possíveis momentos de interação previstos na programação (sessões de perguntas, áreas de networking). <strong>Não forneça contato pessoal ou dados de palestrantes.</strong> Para solicitações especiais, encaminhe ao <strong>balcão de atendimento</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="palestrantes" data-search="palestrante atraso cancelamento não apareceu sumiu cadê onde">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O palestrante está atrasado ou não compareceu. O que fazer?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Acione a <strong>coordenação imediatamente</strong> pelo canal interno. Não informe ao público sobre atrasos sem orientação da organização. Mantenha a calma e oriente os participantes a aguardar.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="palestrantes" data-search="sala verde suporte backstage apoio logística palestrante">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde palestrantes devem se apresentar antes da palestra?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Palestrantes devem ser direcionados à <strong>equipe de produção/backstage</strong> do espaço correspondente. Acione a coordenação se um palestrante chegar sem saber onde ir.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── EXPOSITORES ── -->
+  <div class="category-block" data-cat="expositores" id="cat-expositores">
+    <div class="category-header">
+      <div class="cat-icon">🏬</div>
+      <span class="cat-name">Expositores</span>
+      <span class="cat-count" id="count-expositores"></span>
+    </div>
+
+    <div class="faq-item" data-cat="expositores" data-search="expositor estande montagem desmontagem horário carga descarga">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Expositor com dúvida sobre montagem ou logística do estande.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Questões operacionais de expositores devem ser encaminhadas ao <strong>balcão de atendimento</strong> ou diretamente à equipe de produção da Expo. Não tente resolver pendências de expositores sem autorização da coordenação.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="expositores" data-search="expositor credencial crachá acesso equipe funcionário estande">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Equipe de expositor sem credencial ou com problemas de acesso.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Encaminhe ao <strong>balcão de atendimento</strong>. Toda credencial de expositor deve estar registrada no sistema — não libere acesso a estandes sem verificação.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── PATROCINADORES ── -->
+  <div class="category-block" data-cat="patrocinadores" id="cat-patrocinadores">
+    <div class="category-header">
+      <div class="cat-icon">🤝</div>
+      <span class="cat-name">Patrocinadores</span>
+      <span class="cat-count" id="count-patrocinadores"></span>
+    </div>
+
+    <div class="faq-item" data-cat="patrocinadores" data-search="patrocinador contato comercial parceria proposta interesse">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Alguém quer contato sobre patrocínio ou parceria.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Encaminhe ao <strong>balcão de atendimento</strong>. Negociações comerciais são tratadas exclusivamente pela equipe da ABRH-ES. <strong>Não forneça contatos de organizadores.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="patrocinadores" data-search="patrocinador credencial acesso benefício cota">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Patrocinador com dúvida sobre credenciais ou benefícios da cota.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Encaminhe ao <strong>balcão de atendimento</strong>. A equipe responsável verificará as condições acordadas com cada patrocinador conforme contrato.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ALIMENTAÇÃO ── -->
+  <div class="category-block" data-cat="alimentacao" id="cat-alimentacao">
+    <div class="category-header">
+      <div class="cat-icon">🍽️</div>
+      <span class="cat-name">Alimentação</span>
+      <span class="cat-count" id="count-alimentacao"></span>
+    </div>
+
+    <div class="faq-item" data-cat="alimentacao" data-search="almoço refeição lanche comida praça alimentação food court onde comer restaurante cafeteria">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde o participante pode comer durante o evento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O Centro de Convenções está em uma região com <strong>diversas opções de alimentação nas proximidades</strong> — restaurantes, cafeterias, lanchonetes e padarias. Oriente o participante a explorar as redondezas.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="alimentacao" data-search="coffee break incluso brinde alimentação cortesia refeição inclusa congresso">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O congresso inclui coffee break ou refeição?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Verifique com a coordenação quais serviços de alimentação estão previstos para congressistas. Não confirme inclusão de refeições sem essa informação oficial.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="alimentacao" data-search="restrição alimentar vegano celíaco alergia dieta especial sem glúten">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Participante com restrição alimentar.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Encaminhe ao <strong>balcão de atendimento</strong> para verificar opções disponíveis. Se houver coffee break, informe ao participante que restrições devem ter sido informadas previamente no ato da inscrição.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ACHADOS E PERDIDOS ── -->
+  <div class="category-block" data-cat="achados" id="cat-achados">
+    <div class="category-header">
+      <div class="cat-icon">🔍</div>
+      <span class="cat-name">Achados e Perdidos</span>
+      <span class="cat-count" id="count-achados"></span>
+    </div>
+
+    <div class="faq-item" data-cat="achados" data-search="perdeu objeto pertence esqueceu achou encontrou achados perdidos ponto oficial">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Participante perdeu ou encontrou algum objeto.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Oriente o participante a <strong>procurar a equipe de apoio da organização</strong>. Os itens localizados são direcionados ao ponto oficial de achados e perdidos do evento. Objetos encontrados por voluntários devem ser entregues imediatamente à equipe de apoio.
+          <div class="alert-box">
+            ⚠️ Nunca guarde pertences de terceiros com você. Sempre entregue à equipe de apoio.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="achados" data-search="celular perdeu roubou furto smartphone perdido">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Participante perdeu o celular ou foi furtado.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Para <strong>objeto perdido</strong>: encaminhe ao balcão de atendimento.<br>
+          Para <strong>furto ou roubo</strong>: acione a segurança do evento imediatamente e encaminhe ao balcão. Não tente conduzir investigações — acione os responsáveis.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── EMERGÊNCIAS ── -->
+  <div class="category-block" data-cat="emergencias" id="cat-emergencias">
+    <div class="category-header">
+      <div class="cat-icon">🚨</div>
+      <span class="cat-name">Emergências</span>
+      <span class="cat-count" id="count-emergencias"></span>
+    </div>
+
+    <div class="faq-item" data-cat="emergencias" data-search="passando mal desmaiou mal estar socorro primeiros socorros saúde emergência">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Participante passando mal ou em emergência médica.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Prioridade máxima.</strong> Siga estas etapas:
+          <ul>
+            <li>Acione a <strong>equipe de segurança</strong> ou coordenação imediatamente</li>
+            <li>Se necessário, ligue para o <strong>SAMU (192)</strong></li>
+            <li>Mantenha a área desobstruída</li>
+            <li>Não mova a pessoa se houver suspeita de queda grave</li>
+          </ul>
+          <div class="alert-box danger">
+            🆘 SAMU: 192 | Bombeiros: 193 | Polícia: 190
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="emergencias" data-search="incêndio fumaça evacuação saída emergência alarme fogo">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Alarme de incêndio ou necessidade de evacuação.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Siga imediatamente o <strong>protocolo de evacuação</strong> definido no briefing de voluntários:
+          <ul>
+            <li>Acione a coordenação pelo canal interno</li>
+            <li>Oriente o público para as saídas de emergência com calma</li>
+            <li>Não use elevadores</li>
+            <li>Aguarde instruções da brigada de incêndio do local</li>
+          </ul>
+          <div class="alert-box danger">
+            🔥 Bombeiros: 193
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="emergencias" data-search="conflito briga agressão segurança ameaça situação violência">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Conflito, briga ou situação de risco entre participantes.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <strong>Não se coloque em risco.</strong> Acione a <strong>segurança do evento</strong> imediatamente. Não tente separar ou mediar conflitos físicos. Afaste outros participantes da área de risco enquanto aguarda apoio.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ATENDIMENTO AO PÚBLICO ── -->
+  <div class="category-block" data-cat="atendimento" id="cat-atendimento">
+    <div class="category-header">
+      <div class="cat-icon">🙋</div>
+      <span class="cat-name">Atendimento ao Público</span>
+      <span class="cat-count" id="count-atendimento"></span>
+    </div>
+
+    <div class="faq-item" data-cat="atendimento" data-search="balcão atendimento onde fica informações central apoio">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Onde fica o balcão de atendimento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O <strong>balcão de atendimento</strong> é o principal ponto de apoio ao público do Conexa H. Localize-o com base na sinalização do evento ou consulte a coordenação. <strong>Para qualquer situação especial, encaminhe sempre ao balcão.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="atendimento" data-search="telefone contato organização organizador whatsapp ligar falar quem responsável suporte">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O participante pede o telefone ou contato da organização.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Para dúvidas sobre <strong>inscrição ou e-mail perdido</strong>, o suporte oficial é pelo WhatsApp <strong>(27) 99271-1043</strong>.<br><br>
+          Para qualquer outra situação durante o evento, encaminhe ao <strong>balcão de atendimento</strong>. <strong>Não forneça telefones de organizadores ou da equipe interna.</strong>
+          <div class="alert-box danger">
+            🚫 Nunca divulgue números pessoais da equipe, mesmo que insistam.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="atendimento" data-search="reclamação insatisfação queixa problema sugestão feedback">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Participante com reclamação ou insatisfação.</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Ouça com empatia, não entre em confronto e encaminhe ao <strong>balcão de atendimento</strong>. Diga: <em>"Entendo a sua situação. Vou te encaminhar ao balcão de atendimento para que possamos resolver isso da melhor forma."</em>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="atendimento" data-search="ABRH quem é associação missão o que faz apresentação">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>O que é a ABRH-ES?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          A <strong>ABRH-ES</strong> é a Associação Brasileira de Recursos Humanos — seccional Espírito Santo. É a realizadora do Conexa H, o maior congresso de gestão de pessoas do Estado, promovendo o desenvolvimento da área de RH e liderança no ES.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-cat="atendimento" data-search="redes sociais instagram site oficial seguir conexa abrh">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Qual o Instagram e site oficial do evento?</span>
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          O evento está nas redes sociais e no site oficial da <strong>ABRH-ES</strong>. Oriente o participante a buscar por <strong>@abrh_es</strong> no Instagram e o site do Conexa H para informações atualizadas.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Central de Apoio · <span>Conexa H 2026</span> · Uso exclusivo de voluntários</p>
+  <p style="margin-top:4px;">ABRH-ES · Em caso de dúvida operacional, acione a coordenação</p>
+</footer>
+
+</div><!-- #appContent -->
+
+<script>
+  // ── SENHA ──
+  const SENHA = 'Voluntarios2026';
+
+  function checkPassword() {
+    const input = document.getElementById('passwordInput').value;
+    const error = document.getElementById('lockError');
+    if (input === SENHA) {
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+      sessionStorage.setItem('conexah_auth', '1');
+    } else {
+      error.style.display = 'block';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').focus();
+      setTimeout(() => { error.style.display = 'none'; }, 3000);
+    }
+  }
+
+  function togglePwd() {
+    const input = document.getElementById('passwordInput');
+    const btn = document.getElementById('togglePwd');
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      btn.textContent = '👁️';
+    }
+  }
+
+  // ── TOGGLE FAQ ──
+  function toggleFaq(btn) {
+    const answer = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+    if (isOpen) {
+      btn.classList.remove('open');
+      answer.style.maxHeight = null;
+    } else {
+      btn.classList.add('open');
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+    }
+  }
+
+  // ── TOGGLE PROC ──
+  function toggleProc(btn) {
+    const answer = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+    if (isOpen) {
+      btn.classList.remove('open');
+      answer.style.maxHeight = null;
+    } else {
+      btn.classList.add('open');
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+    }
+  }
+
+  // ── BUSCA ──
+  let currentFilter = 'all';
+
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('clearSearch').style.display = 'none';
+    applyFilters();
+    document.getElementById('searchInput').focus();
+  }
+
+  function filterCat(btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.cat;
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const cat = currentFilter;
+    document.getElementById('quickSection').style.display = q ? 'none' : '';
+    let totalVisible = 0;
+    document.querySelectorAll('.faq-item').forEach(item => {
+      const itemCat = item.dataset.cat;
+      const searchData = (item.dataset.search || '').toLowerCase();
+      const questionText = item.querySelector('.faq-question span')?.textContent.toLowerCase() || '';
+      const answerText = item.querySelector('.faq-answer-inner')?.textContent.toLowerCase() || '';
+      const catMatch = cat === 'all' || itemCat === cat;
+      const searchMatch = !q || searchData.includes(q) || questionText.includes(q) || answerText.includes(q);
+      if (catMatch && searchMatch) {
+        item.classList.remove('hidden');
+        totalVisible++;
+        if (q) highlightItem(item, q);
+        else clearHighlight(item);
+      } else {
+        item.classList.add('hidden');
+        clearHighlight(item);
+      }
+    });
+    document.querySelectorAll('.category-block').forEach(block => {
+      const blockCat = block.dataset.cat;
+      const catMatch = cat === 'all' || blockCat === cat;
+      const visibleItems = block.querySelectorAll('.faq-item:not(.hidden)').length;
+      block.style.display = (catMatch && visibleItems > 0) ? '' : 'none';
+      const countEl = block.querySelector('.cat-count');
+      if (countEl) countEl.textContent = visibleItems;
+    });
+    const volBlock = document.getElementById('volBlock');
+    if (volBlock) volBlock.style.display = (cat === 'all' || cat === 'voluntarios') ? '' : 'none';
+    document.getElementById('noResults').style.display = totalVisible === 0 && q ? 'block' : 'none';
+    const resultsCount = document.getElementById('resultsCount');
+    if (q) {
+      resultsCount.style.display = 'block';
+      resultsCount.innerHTML = `<strong>${totalVisible}</strong> resultado${totalVisible !== 1 ? 's' : ''} encontrado${totalVisible !== 1 ? 's' : ''} para "<strong>${escapeHtml(document.getElementById('searchInput').value)}</strong>"`;
+    } else {
+      resultsCount.style.display = 'none';
+    }
+  }
+
+  function highlightItem(item, q) {
+    const span = item.querySelector('.faq-question span');
+    if (!span) return;
+    const orig = span.dataset.orig || span.textContent;
+    span.dataset.orig = orig;
+    const regex = new RegExp(`(${escapeRegex(q)})`, 'gi');
+    span.innerHTML = orig.replace(regex, '<mark>$1</mark>');
+  }
+
+  function clearHighlight(item) {
+    const span = item.querySelector('.faq-question span');
+    if (!span || !span.dataset.orig) return;
+    span.textContent = span.dataset.orig;
+    delete span.dataset.orig;
+  }
+
+  function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // sessão já autenticada
+    if (sessionStorage.getItem('conexah_auth') === '1') {
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+    }
+    // Enter na tela de senha
+    document.getElementById('passwordInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkPassword();
+    });
+    // busca ao digitar
+    document.getElementById('searchInput').addEventListener('input', () => {
+      const q = document.getElementById('searchInput').value.trim();
+      document.getElementById('clearSearch').style.display = q ? 'block' : 'none';
+      applyFilters();
+    });
+    // contagem inicial
+    document.querySelectorAll('.category-block').forEach(block => {
+      const count = block.querySelectorAll('.faq-item').length;
+      const countEl = block.querySelector('.cat-count');
+      if (countEl) countEl.textContent = count;
+    });
+  });
+</script>
+</body>
+</html>
