@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Apoio · Voluntários · Conexa H 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --r:  #9B1515;
+  --rv: #C42020;
+  --re: #2A0808;
+  --rm: #6B0F0F;
+  --d:  #C8A84B;
+  --dc: #E0C96E;
+  --ds: #F0DFA0;
+  --bg: #F5F0EB;
+  --bm: #EDE8E2;
+  --gz: #9A9A9A;
+  --ge: #4A4A4A;
+  --tx: #1A0A0A;
+  --br: #FFFFFF;
+  --s1: 0 2px 10px rgba(43,8,8,.10);
+  --s2: 0 6px 22px rgba(43,8,8,.18);
+  --ra: 10px;
+  --rb: 7px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:15px;line-height:1.6}
+
+/* TELA DE SENHA */
+#lock{position:fixed;inset:0;background:linear-gradient(160deg,#1A0404 0%,#6B0F0F 40%,#C42020 100%);display:flex;align-items:center;justify-content:center;z-index:9999;padding:32px 24px;overflow:hidden}
+#lock::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(200,168,75,.25) 1.5px,transparent 1.5px);background-size:14px 14px;pointer-events:none}
+#lock::after{content:'';position:absolute;right:-60px;bottom:-60px;width:260px;height:130px;border:20px solid rgba(200,168,75,.18);border-radius:50%;transform:rotate(-20deg);pointer-events:none}
+.lk{position:relative;width:100%;max-width:360px;text-align:center}
+.lbadge{display:block;background:rgba(200,168,75,.18);border:1px solid rgba(200,168,75,.40);color:var(--dc);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:3px;margin-bottom:16px}
+.licon{font-size:48px;margin-bottom:16px;display:block}
+.ltitle{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#fff;line-height:1.1;margin-bottom:4px}
+.ltitle em{color:#fff;font-style:normal}
+.lrule{width:40px;height:3px;background:linear-gradient(90deg,var(--d),transparent);margin:12px auto 20px;border-radius:2px}
+.lsub{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:28px}
+.liw{background:rgba(255,255,255,.10);border:1.5px solid rgba(200,168,75,.35);border-radius:8px;display:flex;align-items:center;padding:0 14px;margin-bottom:12px;transition:border-color .2s}
+.liw:focus-within{border-color:var(--d);background:rgba(255,255,255,.14)}
+.liw span{font-size:18px;margin-right:10px}
+#pInput{flex:1;background:transparent;border:none;outline:none;font-family:'Inter',sans-serif;font-size:16px;color:#fff;padding:14px 0;letter-spacing:2px}
+#pInput::placeholder{color:rgba(255,255,255,.35);letter-spacing:.5px;font-size:14px}
+#tPwd{background:none;border:none;cursor:pointer;font-size:18px;padding:4px;color:rgba(255,255,255,.5)}
+#lBtn{width:100%;background:var(--d);border:none;border-radius:8px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--re);cursor:pointer;transition:background .18s;margin-bottom:14px}
+#lBtn:hover{background:var(--dc)}
+#lErr{color:#FFB3B3;font-size:13px;display:none;margin-top:4px}
+#app{display:none}
+
+/* HEADER */
+header{background:var(--re);overflow:hidden}
+.htop{background:linear-gradient(160deg,#1A0404 0%,#6B0F0F 40%,#C42020 100%);padding:26px 20px 22px;position:relative;overflow:hidden}
+.htop::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(200,168,75,.28) 1.5px,transparent 1.5px);background-size:14px 14px;pointer-events:none}
+.htop::after{content:'';position:absolute;right:-60px;bottom:-70px;width:220px;height:110px;border:18px solid rgba(200,168,75,.22);border-radius:50%;transform:rotate(-20deg);pointer-events:none}
+.hi{position:relative;max-width:720px;margin:0 auto}
+.hbadge{display:inline-block;background:rgba(200,168,75,.18);border:1px solid rgba(200,168,75,.45);color:var(--dc);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:3px;margin-bottom:12px}
+header h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,7vw,42px);font-weight:800;line-height:1.05;color:#ffffff !important;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+header h1 em{color:#ffffff !important;font-style:normal}
+.hrule{width:48px;height:3px;background:linear-gradient(90deg,var(--d),transparent);margin:10px 0 8px;border-radius:2px}
+.hsub{font-size:12.5px;color:rgba(255,255,255,.60)}
+.hbar{background:var(--d);padding:7px 20px;display:flex;align-items:center;justify-content:center;gap:10px}
+.hbar span{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--re)}
+.hbar .sep{color:rgba(42,8,8,.4);font-size:10px}
+
+/* BUSCA */
+.sb{max-width:720px;margin:0 auto;padding:16px 18px 0}
+.sw{background:#fff;border-radius:var(--ra);box-shadow:0 4px 20px rgba(43,8,8,.20);display:flex;align-items:center;gap:10px;padding:12px 16px;border:2px solid transparent;transition:border-color .2s}
+.sw:focus-within{border-color:var(--d)}
+.si{font-size:17px;flex-shrink:0}
+#sInput{flex:1;border:none;outline:none;font-family:'Inter',sans-serif;font-size:14.5px;color:var(--tx);background:transparent}
+#sInput::placeholder{color:var(--gz)}
+#sClear{background:var(--bm);border:none;border-radius:20px;padding:4px 12px;font-size:12px;color:var(--ge);cursor:pointer;display:none;white-space:nowrap;font-family:'Inter',sans-serif}
+.shint{font-size:11.5px;color:var(--gz);margin-top:7px;padding:0 4px}
+
+/* RESULTADOS */
+.rc{max-width:720px;margin:0 auto 8px;padding:0 18px;font-size:13px;color:var(--ge);display:none}
+.rc strong{color:var(--rv)}
+
+/* FILTROS */
+.fs{max-width:720px;margin:0 auto 20px;padding:0 18px}
+.fl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gz);margin-bottom:10px}
+.fsc{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.fsc::-webkit-scrollbar{display:none}
+.fb{flex-shrink:0;background:#fff;border:1.5px solid var(--bm);border-radius:4px;padding:5px 13px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;color:var(--ge);cursor:pointer;transition:all .15s;white-space:nowrap;text-transform:uppercase}
+.fb:hover{border-color:var(--rv);color:var(--rv);background:#FFF5F5}
+.fb.active{background:var(--rv);border-color:var(--rv);color:#fff}
+
+/* RESPOSTAS RÁPIDAS */
+.qs{max-width:720px;margin:0 auto 24px;padding:0 18px}
+.sl{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gz);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bm),transparent)}
+.qg{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.qc{background:#fff;border-radius:var(--rb);padding:13px 14px;border-left:3px solid var(--d);box-shadow:var(--s1);transition:box-shadow .18s,transform .18s;position:relative;overflow:hidden}
+.qc::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;background-image:radial-gradient(circle,rgba(200,168,75,.18) 1px,transparent 1px);background-size:7px 7px;border-radius:0 var(--rb) 0 0;pointer-events:none}
+.qc:hover{box-shadow:var(--s2);transform:translateY(-1px)}
+.qi{font-size:18px;margin-bottom:5px}
+.qt{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--rm);margin-bottom:4px;line-height:1.2}
+.qa{font-size:12px;color:var(--ge);line-height:1.4}
+
+/* CONTEÚDO */
+.mc{max-width:720px;margin:0 auto;padding:0 18px 48px}
+.cb{margin-bottom:28px}
+.ch{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:2px solid var(--bm)}
+.ci{width:34px;height:34px;background:linear-gradient(135deg,var(--re),var(--rv));border-radius:var(--rb);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;position:relative;overflow:hidden}
+.ci::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(200,168,75,.25) 1px,transparent 1px);background-size:6px 6px}
+.cn{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--re)}
+.cc{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--gz);background:var(--bm);padding:2px 9px;border-radius:3px}
+
+/* ACCORDION */
+.fi{background:#fff;border-radius:var(--rb);margin-bottom:5px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden;transition:box-shadow .18s;border-left:2px solid transparent}
+.fi:hover{box-shadow:var(--s1);border-left-color:var(--d)}
+.fi.hidden{display:none}
+.fq{width:100%;background:none;border:none;padding:13px 15px;text-align:left;cursor:pointer;display:flex;align-items:flex-start;gap:10px;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:500;color:var(--tx);line-height:1.4;transition:background .15s}
+.fq:hover{background:#FDF5F5}
+.fq.open{background:#FDF5F5;color:var(--rv)}
+.fch{margin-left:auto;flex-shrink:0;font-size:11px;color:var(--gz);transition:transform .25s;padding-top:2px}
+.fq.open .fch{transform:rotate(180deg);color:var(--rv)}
+.fa{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.fai{padding:12px 15px 14px;font-size:13.5px;color:var(--ge);line-height:1.65;border-top:1px solid var(--bm)}
+.fai strong{color:var(--rm)}
+.fai ul{padding-left:16px;margin-top:6px}
+.fai li{margin-bottom:4px}
+.ab{background:#FFFBEE;border-left:3px solid var(--d);border-radius:var(--rb);padding:9px 12px;margin-top:10px;font-size:13px}
+.ab.danger{background:#FFF4F4;border-color:var(--rv);color:#7A0A0A}
+
+/* VOLUNTÁRIOS */
+.vb{border-radius:var(--ra);margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(43,8,8,.25)}
+.vh{background:linear-gradient(135deg,#1A0404 0%,#6B0F0F 50%,#9B1515 100%);padding:18px 20px 16px;position:relative;overflow:hidden}
+.vh::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(200,168,75,.30) 1.5px,transparent 1.5px);background-size:12px 12px;pointer-events:none}
+.vh::after{content:'';position:absolute;right:-30px;bottom:-40px;width:120px;height:60px;border:12px solid rgba(200,168,75,.25);border-radius:50%;transform:rotate(-15deg)}
+.vh h2{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--dc);position:relative}
+.vh p{font-size:12px;color:rgba(255,255,255,.55);margin-top:3px;position:relative}
+.vbd{background:#1E0606;padding:14px 16px}
+.pi{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-radius:var(--rb);margin-bottom:7px;overflow:hidden}
+.pq{width:100%;background:none;border:none;padding:11px 14px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:9px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,.88);transition:background .15s}
+.pq:hover{background:rgba(255,255,255,.05)}
+.pq .pio{font-size:14px;flex-shrink:0}
+.pch{margin-left:auto;font-size:10px;color:var(--dc);transition:transform .25s;flex-shrink:0}
+.pq.open .pch{transform:rotate(180deg)}
+.pa{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.pai{padding:10px 14px 13px;font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.65;border-top:1px solid rgba(255,255,255,.10)}
+.pai strong{color:var(--ds)}
+.pai ul{padding-left:15px;margin-top:5px}
+.pai li{margin-bottom:3px}
+
+/* SEM RESULTADO */
+.nr{text-align:center;padding:44px 20px;display:none}
+.nr .nri{font-size:38px;margin-bottom:12px}
+.nr h3{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--rv);margin-bottom:6px}
+.nr p{font-size:13px;color:var(--gz)}
+
+/* FOOTER */
+footer{background:var(--re);color:rgba(255,255,255,.45);text-align:center;padding:16px 20px;font-size:12px;position:relative;overflow:hidden}
+footer::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(200,168,75,.12) 1px,transparent 1px);background-size:12px 12px;pointer-events:none}
+footer p{position:relative}
+footer span{color:var(--dc)}
+
+mark{background:rgba(200,168,75,.35);color:var(--tx);border-radius:2px;padding:0 2px}
+
+@media(max-width:480px){
+  .qg{grid-template-columns:1fr 1fr}
+  .htop{padding:20px 16px 18px}
+  .sb,.fs,.qs,.mc{padding:0 13px}
+  .rc{padding:0 13px}
+  header h1{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<div id="lock">
+  <div class="lk">
+    <span class="lbadge">🔒 Acesso restrito</span>
+    <span class="licon">🎫</span>
+    <div class="ltitle">Central de Apoio<br><em>Conexa H 2026</em></div>
+    <div class="lrule"></div>
+    <p class="lsub">Insira a senha para acessar a central dos voluntários</p>
+    <div class="liw">
+      <span>🔑</span>
+      <input type="password" id="pInput" placeholder="Digite a senha" autocomplete="off">
+      <button id="tPwd" onclick="toggleP()" type="button">👁️</button>
+    </div>
+    <p id="lErr">Senha incorreta. Tente novamente.</p>
+    <button id="lBtn" onclick="checkP()">Entrar</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="htop">
+    <div class="hi">
+      <div class="hbadge">🔒 Uso interno · Voluntários</div>
+      <h1 style="color:#ffffff !important;">Central de Apoio<br><em style="color:#ffffff !important;">Conexa H 2026</em></h1>
+      <div class="hrule"></div>
+      <p class="hsub">Respostas rápidas para orientar o público durante o evento</p>
+    </div>
+  </div>
+  <div class="hbar">
+    <span>17 Jun</span><span class="sep">◆</span>
+    <span>Centro de Convenções</span><span class="sep">◆</span>
+    <span>Vitória · ES</span>
+  </div>
+</header>
+
+<div class="sb">
+  <div class="sw">
+    <span class="si">🔍</span>
+    <input type="search" id="sInput" placeholder="Buscar por dúvida, palavra-chave ou categoria..." autocomplete="off">
+    <button id="sClear" onclick="clearS()">Limpar</button>
+  </div>
+  <p class="shint">Busca em perguntas, respostas e categorias</p>
+</div>
+
+<div class="rc" id="rc"></div>
+
+<div class="fs">
+  <p class="fl">Filtrar por área</p>
+  <div class="fsc">
+    <button class="fb active" data-cat="all" onclick="filterC(this)">Todas</button>
+    <button class="fb" data-cat="credenciamento" onclick="filterC(this)">🎫 Credenciamento</button>
+    <button class="fb" data-cat="ingressos" onclick="filterC(this)">🎟️ Ingressos</button>
+    <button class="fb" data-cat="programacao" onclick="filterC(this)">📅 Programação</button>
+    <button class="fb" data-cat="localizacao" onclick="filterC(this)">📍 Localização</button>
+    <button class="fb" data-cat="acessibilidade" onclick="filterC(this)">♿ Acessibilidade</button>
+    <button class="fb" data-cat="expo" onclick="filterC(this)">🏢 Expo</button>
+    <button class="fb" data-cat="palestrantes" onclick="filterC(this)">🎤 Palestrantes</button>
+    <button class="fb" data-cat="expositores" onclick="filterC(this)">🏬 Expositores</button>
+    <button class="fb" data-cat="patrocinadores" onclick="filterC(this)">🤝 Patrocinadores</button>
+    <button class="fb" data-cat="alimentacao" onclick="filterC(this)">🍽️ Alimentação</button>
+    <button class="fb" data-cat="achados" onclick="filterC(this)">🔍 Achados</button>
+    <button class="fb" data-cat="emergencias" onclick="filterC(this)">🚨 Emergências</button>
+    <button class="fb" data-cat="atendimento" onclick="filterC(this)">🙋 Atendimento</button>
+  </div>
+</div>
+
+<div class="qs" id="qs">
+  <p class="sl">⚡ Respostas rápidas</p>
+  <div class="qg">
+    <div class="qc"><div class="qi">⏰</div><div class="qt">Credenciamento congressistas</div><div class="qa">A partir das <strong>07h30</strong>.</div></div>
+    <div class="qc"><div class="qi">🏛️</div><div class="qt">Abertura oficial</div><div class="qa">Abertura do congresso às <strong>08h30</strong>.</div></div>
+    <div class="qc"><div class="qi">🎪</div><div class="qt">Credenciamento Expo</div><div class="qa">Visitantes da Expo a partir das <strong>09h00</strong>.</div></div>
+    <div class="qc"><div class="qi">📱</div><div class="qt">Precisa imprimir ingresso?</div><div class="qa"><strong>Não.</strong> Basta mostrar a inscrição no celular.</div></div>
+    <div class="qc"><div class="qi">📍</div><div class="qt">Endereço do evento</div><div class="qa">Rua Constante Sodré, 157 – Santa Lúcia, Vitória/ES.</div></div>
+    <div class="qc"><div class="qi">🚗</div><div class="qt">Estacionamento</div><div class="qa"><strong>Não há</strong> estacionamento próprio. Há rotativos nas proximidades.</div></div>
+    <div class="qc"><div class="qi">📞</div><div class="qt">WhatsApp de suporte</div><div class="qa"><strong>(27) 99271-1043</strong> — dúvidas de inscrição.</div></div>
+    <div class="qc"><div class="qi">🙋</div><div class="qt">Problema especial</div><div class="qa">Encaminhe ao <strong>balcão de atendimento</strong>.</div></div>
+  </div>
+</div>
+
+<div class="mc" id="mc">
+
+<!-- VOLUNTÁRIOS -->
+<div class="vb" id="volBlock" data-cat="voluntarios">
+  <div class="vh">
+    <h2>🔒 Procedimentos Internos · Voluntários</h2>
+    <p>Área restrita — não compartilhe com o público</p>
+  </div>
+  <div class="vbd">
+
+    <div class="pi" data-search="comunicação interna rádio escala turno posto voluntário">
+      <button class="pq" onclick="tP(this)"><span class="pio">📻</span> Comunicação interna entre voluntários <span class="pch">▼</span></button>
+      <div class="pa"><div class="pai">Toda comunicação da equipe ocorre pelos canais definidos pela coordenação. <strong>Não compartilhe informações operacionais com o público.</strong> Em caso de dúvida, acione a coordenação pelo canal oficial.</div></div>
+    </div>
+
+    <div class="pi" data-search="escala turno horário intervalo pausa voluntário">
+      <button class="pq" onclick="tP(this)"><span class="pio">🗓️</span> Escalas e turnos <span class="pch">▼</span></button>
+      <div class="pa"><div class="pai"><strong>Não abandone seu posto</strong> antes de sinalizar à coordenação. Intervalos devem ser comunicados antecipadamente. Em caso de imprevisto, avise o coordenador imediatamente.</div></div>
+    </div>
+
+    <div class="pi" data-search="postura linguagem comportamento público atendimento voluntário">
+      <button class="pq" onclick="tP(this)"><span class="pio">💬</span> Postura no atendimento ao público <span class="pch">▼</span></button>
+      <div class="pa"><div class="pai"><strong>Seja cordial, objetivo e seguro.</strong><ul><li>Não demonstre insegurança — diga "vou verificar" se necessário</li><li>Não invente informações</li><li>Nunca divulgue telefone de organizadores</li><li>Encaminhe situações complexas ao balcão</li><li>Mantenha o colete visível o tempo todo</li></ul></div></div>
+    </div>
+
+    <div class="pi" data-search="situação especial problema incidente conflito segurança acionar">
+      <button class="pq" onclick="tP(this)"><span class="pio">⚠️</span> Situações especiais e imprevistos <span class="pch">▼</span></button>
+      <div class="pa"><div class="pai">Acione a coordenação imediatamente para:<ul><li>Conflitos com participantes</li><li>Pessoas passando mal</li><li>Problemas técnicos nos espaços</li><li>Objetos abandonados ou suspeitos</li><li>Situações de acessibilidade especial</li></ul><strong>Não tente resolver situações de risco sozinho.</strong></div></div>
+    </div>
+
+    <div class="pi" data-search="credenciamento acesso erro sistema problema voluntário">
+      <button class="pq" onclick="tP(this)"><span class="pio">🎫</span> Problemas no credenciamento <span class="pch">▼</span></button>
+      <div class="pa"><div class="pai">Se a inscrição não constar no sistema:<ul><li>Peça ao participante que aguarde brevemente</li><li>Acione o responsável técnico do credenciamento</li><li>Não libere acesso sem confirmação</li><li>Se a fila crescer, avise a coordenação</li></ul><strong>Não tome decisões unilaterais sobre liberação de acesso.</strong></div></div>
+    </div>
+
+    <div class="pi" data-search="imprensa mídia fotógrafo jornalista câmera autorização">
+      <button class="pq" onclick="tP(this)"><span class="pio">📸</span> Imprensa e câmeras <span class="pch">▼</span></button>
+      <div class="pa"><div class="pai">Jornalistas e fotógrafos devem ter credencial específica. Sem credencial, <strong>encaminhe ao balcão de atendimento</strong>. Não conceda entrevistas em nome da ABRH-ES.</div></div>
+    </div>
+
+    <div class="pi" data-search="encerramento desmontagem saída final evento voluntário">
+      <button class="pq" onclick="tP(this)"><span class="pio">🏁</span> Procedimentos de encerramento <span class="pch">▼</span></button>
+      <div class="pa"><div class="pai">Ao final do evento:<ul><li>Aguarde liberação formal da coordenação</li><li>Entregue materiais recebidos (rádio, colete, tablet)</li><li>Objetos encontrados devem ser entregues ao balcão</li><li>Participe do briefing de encerramento se convocado</li></ul></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SEM RESULTADO -->
+<div class="nr" id="nr">
+  <div class="nri">🔎</div>
+  <h3>Nenhum resultado encontrado</h3>
+  <p>Tente outros termos ou encaminhe a dúvida ao balcão de atendimento.</p>
+</div>
+
+<!-- CREDENCIAMENTO -->
+<div class="cb" data-cat="credenciamento" id="cat-credenciamento">
+  <div class="ch"><div class="ci">🎫</div><span class="cn">Credenciamento</span><span class="cc" id="count-credenciamento"></span></div>
+
+  <div class="fi" data-cat="credenciamento" data-search="horário credenciamento congressistas que horas abre abertura 7h30 8h30">
+    <button class="fq" onclick="tF(this)"><span>A que horas abre o credenciamento para congressistas?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">O credenciamento para <strong>congressistas</strong> abre às <strong>07h30</strong>. A abertura oficial do congresso acontece às <strong>08h30</strong>. Oriente o participante a chegar com a inscrição já aberta no celular.</div></div>
+  </div>
+
+  <div class="fi" data-cat="credenciamento" data-search="horário credenciamento visitantes expo 9h">
+    <button class="fq" onclick="tF(this)"><span>E o credenciamento dos visitantes da Expo?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Visitantes da <strong>Expo Conexa H</strong> são credenciados a partir das <strong>09h00</strong>.</div></div>
+  </div>
+
+  <div class="fi" data-cat="credenciamento" data-search="imprimir ingresso bilhete comprovante ticket necessário celular">
+    <button class="fq" onclick="tF(this)"><span>É necessário imprimir o ingresso?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Não.</strong> Basta apresentar a inscrição no celular no momento do credenciamento.</div></div>
+  </div>
+
+  <div class="fi" data-cat="credenciamento" data-search="já credenciei plataforma como funciona onde inscrição sistema">
+    <button class="fq" onclick="tF(this)"><span>Como o participante verifica a inscrição no Já Credenciei?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">O participante acessa o site <strong>jacredenciei.com.br</strong> com o e-mail da inscrição. Em caso de problemas, <strong>encaminhe ao balcão de atendimento</strong>.</div></div>
+  </div>
+
+  <div class="fi" data-cat="credenciamento" data-search="diferença credencial tipo congressista visitante acesso">
+    <button class="fq" onclick="tF(this)"><span>Qual a diferença entre os tipos de credencial?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><ul><li><strong>Congressista:</strong> acesso ao congresso completo — palestras, painéis, auditórios, arenas e Expo.</li><li><strong>Visitante da Expo:</strong> acesso apenas à feira. Não acessa o congresso.</li></ul></div></div>
+  </div>
+
+  <div class="fi" data-cat="credenciamento" data-search="perdeu crachá esqueceu credencial segunda via">
+    <button class="fq" onclick="tF(this)"><span>O participante perdeu ou esqueceu o crachá.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong>. A equipe verificará a inscrição e providenciará segunda via.</div></div>
+  </div>
+
+</div>
+
+<!-- INGRESSOS -->
+<div class="cb" data-cat="ingressos" id="cat-ingressos">
+  <div class="ch"><div class="ci">🎟️</div><span class="cn">Ingressos e Inscrições</span><span class="cc" id="count-ingressos"></span></div>
+
+  <div class="fi" data-cat="ingressos" data-search="comprar ingresso ainda dá tempo disponível vaga link site">
+    <button class="fq" onclick="tF(this)"><span>Ainda é possível se inscrever no evento?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Sim.</strong> Os ingressos seguem disponíveis enquanto houver vagas. A compra pode ser feita em <strong>jacredenciei.com.br/e/conexah26</strong></div></div>
+  </div>
+
+  <div class="fi" data-cat="ingressos" data-search="perdi email confirmação spam suporte whatsapp">
+    <button class="fq" onclick="tF(this)"><span>O participante perdeu o e-mail de confirmação.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Oriente a verificar <strong>spam, lixo eletrônico e promoções</strong>. Se não encontrar, o suporte é pelo WhatsApp: <strong>(27) 99271-1043</strong>.<div class="ab">📱 WhatsApp: <strong>(27) 99271-1043</strong></div></div></div>
+  </div>
+
+  <div class="fi" data-cat="ingressos" data-search="como evitar fila credenciamento acesso rápido agilizar">
+    <button class="fq" onclick="tF(this)"><span>Como evitar filas no credenciamento?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Oriente o participante a chegar com a <strong>inscrição já aberta no celular</strong>. Chegar com antecedência também ajuda.</div></div>
+  </div>
+
+  <div class="fi" data-cat="ingressos" data-search="reembolso cancelamento devolução dinheiro">
+    <button class="fq" onclick="tF(this)"><span>O participante quer cancelar ou pedir reembolso.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong>. <strong>Não tente resolver ou garantir reembolsos diretamente.</strong></div></div>
+  </div>
+
+  <div class="fi" data-cat="ingressos" data-search="transferência ingresso outra pessoa nome diferente">
+    <button class="fq" onclick="tF(this)"><span>O ingresso pode ser transferido para outra pessoa?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong> para verificação. Não tome decisões sobre transferência sem autorização.</div></div>
+  </div>
+
+  <div class="fi" data-cat="ingressos" data-search="nota fiscal recibo comprovante empresa cnpj">
+    <button class="fq" onclick="tF(this)"><span>Preciso de nota fiscal / comprovante para empresa.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong>. Questões fiscais são tratadas pela equipe administrativa da ABRH-ES.</div></div>
+  </div>
+
+</div>
+
+<!-- PROGRAMAÇÃO -->
+<div class="cb" data-cat="programacao" id="cat-programacao">
+  <div class="ch"><div class="ci">📅</div><span class="cn">Programação</span><span class="cc" id="count-programacao"></span></div>
+
+  <div class="fi" data-cat="programacao" data-search="programação onde ver consultar grade horário palestra aplicativo">
+    <button class="fq" onclick="tF(this)"><span>Onde ver a programação completa?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">A programação completa está na <strong>seção Programação do aplicativo</strong> — horários, palestrantes e locais. Também no site oficial e Instagram da ABRH-ES.</div></div>
+  </div>
+
+  <div class="fi" data-cat="programacao" data-search="auditório principal onde fica localização acesso congressista mapa">
+    <button class="fq" onclick="tF(this)"><span>Onde fica o auditório da programação principal?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">A localização está no <strong>Mapa da Feira no aplicativo</strong>. O acesso à programação principal é <strong>exclusivo para congressistas credenciados</strong>.</div></div>
+  </div>
+
+  <div class="fi" data-cat="programacao" data-search="aplicativo app baixar download evento conexa">
+    <button class="fq" onclick="tF(this)"><span>Como baixar o aplicativo do evento?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Buscar por <strong>"Conexa H"</strong> na App Store (iPhone) ou Google Play (Android).</div></div>
+  </div>
+
+  <div class="fi" data-cat="programacao" data-search="palestra cancelada adiada mudou horário alteração">
+    <button class="fq" onclick="tF(this)"><span>Houve alteração em alguma palestra?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Alterações são atualizadas no <strong>app</strong> e redes sociais da ABRH-ES. Consulte a coordenação antes de confirmar qualquer mudança ao público.</div></div>
+  </div>
+
+  <div class="fi" data-cat="programacao" data-search="sair retornar voltar entrar reentrada durante dia">
+    <button class="fq" onclick="tF(this)"><span>O participante pode sair e retornar durante o dia?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Sim.</strong> Após o credenciamento, o participante pode sair e retornar ao evento durante o dia.</div></div>
+  </div>
+
+  <div class="fi" data-cat="programacao" data-search="mentoria como participar horário local orientação">
+    <button class="fq" onclick="tF(this)"><span>Como participar das mentorias?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Informações sobre mentorias estão na <strong>seção Mentoria do aplicativo</strong>.</div></div>
+  </div>
+
+  <div class="fi" data-cat="programacao" data-search="networking conversar conhecer pessoas onde quando">
+    <button class="fq" onclick="tF(this)"><span>Onde fazer networking?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">O networking acontece em toda a programação, especialmente nos <strong>intervalos</strong> e na <strong>Expo Conexa H</strong>.</div></div>
+  </div>
+
+  <div class="fi" data-cat="programacao" data-search="certificado participação como emitir pegar baixar após evento">
+    <button class="fq" onclick="tF(this)"><span>Como obter o certificado de participação?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">As orientações estarão na <strong>seção Certificado do aplicativo</strong> após o evento.</div></div>
+  </div>
+
+  <div class="fi" data-cat="programacao" data-search="fotos oficiais evento onde ver acessar compartilhar">
+    <button class="fq" onclick="tF(this)"><span>Como acessar as fotos oficiais?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">As fotos estarão na <strong>seção "Você no Conexa H"</strong> durante o evento e depois na seção <strong>Fotos Oficiais</strong> do aplicativo.</div></div>
+  </div>
+
+</div>
+
+<!-- LOCALIZAÇÃO -->
+<div class="cb" data-cat="localizacao" id="cat-localizacao">
+  <div class="ch"><div class="ci">📍</div><span class="cn">Localização e Estrutura</span><span class="cc" id="count-localizacao"></span></div>
+
+  <div class="fi" data-cat="localizacao" data-search="mapa evento planta onde fica espaços aplicativo">
+    <button class="fq" onclick="tF(this)"><span>Onde encontro o mapa do evento?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">O mapa completo está na <strong>seção Mapa da Feira do aplicativo</strong> — auditórios, área de exposição e todos os espaços.</div></div>
+  </div>
+
+  <div class="fi" data-cat="localizacao" data-search="onde fica centro convenções vitória endereço rua constante sodré santa lúcia">
+    <button class="fq" onclick="tF(this)"><span>Onde fica o Centro de Convenções?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Rua Constante Sodré, 157 – Santa Lúcia, Vitória/ES.</strong> Buscar no Google Maps por "Centro de Convenções de Vitória".</div></div>
+  </div>
+
+  <div class="fi" data-cat="localizacao" data-search="estacionamento vaga carro onde estacionar rotativo">
+    <button class="fq" onclick="tF(this)"><span>Há estacionamento disponível?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Não há estacionamento próprio.</strong> Há rotativos e estacionamentos particulares nas proximidades. Recomende chegar com antecedência.<div class="ab">💡 Sugestão: Uber ou 99 para evitar problemas de estacionamento.</div></div></div>
+  </div>
+
+  <div class="fi" data-cat="localizacao" data-search="banheiro toalete sanitário adaptado onde sinalizado">
+    <button class="fq" onclick="tF(this)"><span>Onde ficam os banheiros?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Os banheiros estão <strong>sinalizados nas dependências do Centro de Convenções</strong>, incluindo banheiros adaptados.</div></div>
+  </div>
+
+  <div class="fi" data-cat="localizacao" data-search="wifi internet senha rede conexão">
+    <button class="fq" onclick="tF(this)"><span>Há Wi-Fi disponível?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Verifique com a coordenação a disponibilidade e senha oficial. <strong>Não confirme sem essa informação.</strong></div></div>
+  </div>
+
+  <div class="fi" data-cat="localizacao" data-search="guarda volumes bagagem mala guardar pertences">
+    <button class="fq" onclick="tF(this)"><span>Há guarda-volumes?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Verifique com a coordenação. Encaminhe ao <strong>balcão de atendimento</strong> para orientação.</div></div>
+  </div>
+
+</div>
+
+<!-- ACESSIBILIDADE -->
+<div class="cb" data-cat="acessibilidade" id="cat-acessibilidade">
+  <div class="ch"><div class="ci">♿</div><span class="cn">Acessibilidade</span><span class="cc" id="count-acessibilidade"></span></div>
+
+  <div class="fi" data-cat="acessibilidade" data-search="acessível cadeirante deficiência mobilidade entrada rampa banheiro adaptado rota">
+    <button class="fq" onclick="tF(this)"><span>O evento é acessível para cadeirantes?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Sim.</strong> O Centro de Convenções conta com:<ul><li>Entradas acessíveis</li><li>Banheiros adaptados</li><li>Rotas de circulação acessíveis</li><li>Espaços reservados no auditório</li><li>Sinalização inclusiva</li><li>Equipe de apoio para orientação</li></ul></div></div>
+  </div>
+
+  <div class="fi" data-cat="acessibilidade" data-search="intérprete libras surdo sinais língua brasileira tradução programação arenas">
+    <button class="fq" onclick="tF(this)"><span>Haverá intérprete de Libras?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Sim.</strong> Haverá intérprete na <strong>programação principal e nas arenas</strong>. Consulte o aplicativo para saber quais atividades contemplam interpretação.</div></div>
+  </div>
+
+  <div class="fi" data-cat="acessibilidade" data-search="dúvida acessibilidade especial apoio assistência necessidade">
+    <button class="fq" onclick="tF(this)"><span>Participante com necessidade especial de acessibilidade.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong>. Não tente resolver sozinho situações que requerem apoio especializado.</div></div>
+  </div>
+
+</div>
+
+<!-- EXPO -->
+<div class="cb" data-cat="expo" id="cat-expo">
+  <div class="ch"><div class="ci">🏢</div><span class="cn">Expo Conexa H</span><span class="cc" id="count-expo"></span></div>
+
+  <div class="fi" data-cat="expo" data-search="expo o que é feira negócios como funciona visitante">
+    <button class="fq" onclick="tF(this)"><span>O que é a Expo Conexa H?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">A <strong>Expo Conexa H</strong> é a feira de negócios do evento, aberta para congressistas e visitantes. Conta com estandes, ativações, experiências e networking.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expo" data-search="congressista pode entrar expo acesso">
+    <button class="fq" onclick="tF(this)"><span>Congressistas podem entrar na Expo?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Sim.</strong> Congressistas têm acesso à Expo incluído. Visitantes da Expo <strong>não têm acesso</strong> ao congresso.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expo" data-search="visitante expo acesso congresso palestra auditório pode entrar">
+    <button class="fq" onclick="tF(this)"><span>Visitante da Expo pode assistir às palestras?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Não.</strong> O congresso é exclusivo para congressistas credenciados.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expo" data-search="horário expo que horas abre fecha credenciamento visitante">
+    <button class="fq" onclick="tF(this)"><span>Qual o horário da Expo?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">O credenciamento de visitantes começa às <strong>09h00</strong>. Para horário de encerramento, consulte o app ou a coordenação.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expo" data-search="empresa expositora como encontrar estande lista aplicativo">
+    <button class="fq" onclick="tF(this)"><span>Como encontrar uma empresa expositora?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Na <strong>seção Expositores do aplicativo</strong> — lista completa com localização no mapa da feira.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expo" data-search="patrocinadores quais empresas lista aplicativo">
+    <button class="fq" onclick="tF(this)"><span>Como ver a lista de patrocinadores?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Na <strong>seção Patrocinadores do aplicativo</strong>.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expo" data-search="gamificação game jogo pontos atividades estandes interação conexa h game ranking">
+    <button class="fq" onclick="tF(this)"><span>Como funciona o Conexa H Game?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">O <strong>Conexa H Game</strong> é a gamificação oficial. O participante acumula pontos visitando estandes e participando de atividades. Pontuação na <strong>seção Ranking do aplicativo</strong>.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expo" data-search="stand ABRH onde fica associação benefícios">
+    <button class="fq" onclick="tF(this)"><span>Onde fica o stand da ABRH-ES?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Identificado no <strong>Mapa da Feira no aplicativo</strong>. A equipe apresenta benefícios e oportunidades de associação.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expo" data-search="prêmio ser humano o que é reconhecimento projetos RH">
+    <button class="fq" onclick="tF(this)"><span>O que é o Prêmio Ser Humano?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Iniciativa da ABRH que reconhece projetos de excelência em gestão de pessoas. Mais informações na <strong>seção Prêmio Ser Humano do aplicativo</strong>.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expo" data-search="outros eventos ABRH agenda próximos iniciativas">
+    <button class="fq" onclick="tF(this)"><span>Como conhecer outros eventos da ABRH-ES?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Na <strong>seção Eventos ABRH-ES do aplicativo</strong>.</div></div>
+  </div>
+
+</div>
+
+<!-- PALESTRANTES -->
+<div class="cb" data-cat="palestrantes" id="cat-palestrantes">
+  <div class="ch"><div class="ci">🎤</div><span class="cn">Palestrantes</span><span class="cc" id="count-palestrantes"></span></div>
+
+  <div class="fi" data-cat="palestrantes" data-search="palestrante contato falar conversar autógrafo foto">
+    <button class="fq" onclick="tF(this)"><span>O participante quer falar com algum palestrante.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Oriente a aguardar momentos de interação na programação. <strong>Não forneça contato pessoal de palestrantes.</strong> Para solicitações especiais, encaminhe ao balcão.</div></div>
+  </div>
+
+  <div class="fi" data-cat="palestrantes" data-search="palestrante atraso cancelamento não apareceu cadê">
+    <button class="fq" onclick="tF(this)"><span>O palestrante está atrasado ou não compareceu.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Acione a <strong>coordenação imediatamente</strong>. Não informe atrasos ao público sem orientação da organização.</div></div>
+  </div>
+
+  <div class="fi" data-cat="palestrantes" data-search="sala verde backstage apoio logística palestrante">
+    <button class="fq" onclick="tF(this)"><span>Onde palestrantes devem se apresentar antes da palestra?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Direcioná-los à <strong>equipe de produção/backstage</strong> do espaço correspondente.</div></div>
+  </div>
+
+</div>
+
+<!-- EXPOSITORES -->
+<div class="cb" data-cat="expositores" id="cat-expositores">
+  <div class="ch"><div class="ci">🏬</div><span class="cn">Expositores</span><span class="cc" id="count-expositores"></span></div>
+
+  <div class="fi" data-cat="expositores" data-search="expositor estande montagem desmontagem logística">
+    <button class="fq" onclick="tF(this)"><span>Expositor com dúvida sobre montagem ou logística.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong> ou à equipe de produção da Expo.</div></div>
+  </div>
+
+  <div class="fi" data-cat="expositores" data-search="expositor credencial crachá acesso equipe funcionário">
+    <button class="fq" onclick="tF(this)"><span>Equipe de expositor sem credencial.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong>. Não libere acesso sem verificação no sistema.</div></div>
+  </div>
+
+</div>
+
+<!-- PATROCINADORES -->
+<div class="cb" data-cat="patrocinadores" id="cat-patrocinadores">
+  <div class="ch"><div class="ci">🤝</div><span class="cn">Patrocinadores</span><span class="cc" id="count-patrocinadores"></span></div>
+
+  <div class="fi" data-cat="patrocinadores" data-search="patrocinador contato comercial parceria proposta interesse">
+    <button class="fq" onclick="tF(this)"><span>Alguém quer contato sobre patrocínio.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong>. <strong>Não forneça contatos de organizadores.</strong></div></div>
+  </div>
+
+  <div class="fi" data-cat="patrocinadores" data-search="patrocinador credencial acesso benefício cota">
+    <button class="fq" onclick="tF(this)"><span>Patrocinador com dúvida sobre credenciais ou benefícios.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong>.</div></div>
+  </div>
+
+</div>
+
+<!-- ALIMENTAÇÃO -->
+<div class="cb" data-cat="alimentacao" id="cat-alimentacao">
+  <div class="ch"><div class="ci">🍽️</div><span class="cn">Alimentação</span><span class="cc" id="count-alimentacao"></span></div>
+
+  <div class="fi" data-cat="alimentacao" data-search="almoço refeição lanche comida onde comer restaurante cafeteria">
+    <button class="fq" onclick="tF(this)"><span>Onde comer durante o evento?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">O Centro de Convenções está em região com <strong>diversas opções nas proximidades</strong> — restaurantes, cafeterias, lanchonetes e padarias.</div></div>
+  </div>
+
+  <div class="fi" data-cat="alimentacao" data-search="coffee break incluso refeição inclusa congresso">
+    <button class="fq" onclick="tF(this)"><span>O congresso inclui coffee break?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Verifique com a coordenação quais serviços de alimentação estão previstos. Não confirme sem informação oficial.</div></div>
+  </div>
+
+  <div class="fi" data-cat="alimentacao" data-search="restrição alimentar vegano celíaco alergia dieta especial">
+    <button class="fq" onclick="tF(this)"><span>Participante com restrição alimentar.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe ao <strong>balcão de atendimento</strong> para verificar opções disponíveis.</div></div>
+  </div>
+
+</div>
+
+<!-- ACHADOS E PERDIDOS -->
+<div class="cb" data-cat="achados" id="cat-achados">
+  <div class="ch"><div class="ci">🔍</div><span class="cn">Achados e Perdidos</span><span class="cc" id="count-achados"></span></div>
+
+  <div class="fi" data-cat="achados" data-search="perdeu objeto pertence esqueceu achou encontrou achados perdidos">
+    <button class="fq" onclick="tF(this)"><span>Participante perdeu ou encontrou algum objeto.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Encaminhe à <strong>equipe de apoio da organização</strong>. Objetos encontrados por voluntários devem ser entregues imediatamente.<div class="ab">⚠️ Nunca guarde pertences de terceiros com você.</div></div></div>
+  </div>
+
+  <div class="fi" data-cat="achados" data-search="celular perdeu roubou furto smartphone">
+    <button class="fq" onclick="tF(this)"><span>Participante perdeu o celular ou foi furtado.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Perdido:</strong> encaminhe ao balcão de atendimento.<br><strong>Furto/roubo:</strong> acione a segurança imediatamente.<div class="ab danger">🚨 Polícia: 190</div></div></div>
+  </div>
+
+</div>
+
+<!-- EMERGÊNCIAS -->
+<div class="cb" data-cat="emergencias" id="cat-emergencias">
+  <div class="ch"><div class="ci">🚨</div><span class="cn">Emergências</span><span class="cc" id="count-emergencias"></span></div>
+
+  <div class="fi" data-cat="emergencias" data-search="passando mal desmaiou socorro primeiros socorros saúde emergência">
+    <button class="fq" onclick="tF(this)"><span>Participante passando mal ou em emergência médica.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Prioridade máxima.</strong><ul><li>Acione a segurança ou coordenação imediatamente</li><li>Se necessário, ligue para o SAMU</li><li>Mantenha a área desobstruída</li><li>Não mova a pessoa se houver queda grave</li></ul><div class="ab danger">🆘 SAMU: 192 | Bombeiros: 193 | Polícia: 190</div></div></div>
+  </div>
+
+  <div class="fi" data-cat="emergencias" data-search="incêndio fumaça evacuação saída alarme fogo">
+    <button class="fq" onclick="tF(this)"><span>Alarme de incêndio ou evacuação.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><ul><li>Acione a coordenação pelo canal interno</li><li>Oriente o público para as saídas de emergência com calma</li><li>Não use elevadores</li><li>Aguarde instruções da brigada</li></ul><div class="ab danger">🔥 Bombeiros: 193</div></div></div>
+  </div>
+
+  <div class="fi" data-cat="emergencias" data-search="conflito briga agressão segurança ameaça violência">
+    <button class="fq" onclick="tF(this)"><span>Conflito ou situação de risco entre participantes.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai"><strong>Não se coloque em risco.</strong> Acione a segurança imediatamente. Não tente separar conflitos físicos.</div></div>
+  </div>
+
+</div>
+
+<!-- ATENDIMENTO -->
+<div class="cb" data-cat="atendimento" id="cat-atendimento">
+  <div class="ch"><div class="ci">🙋</div><span class="cn">Atendimento ao Público</span><span class="cc" id="count-atendimento"></span></div>
+
+  <div class="fi" data-cat="atendimento" data-search="balcão atendimento onde fica informações central apoio">
+    <button class="fq" onclick="tF(this)"><span>Onde fica o balcão de atendimento?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">O <strong>balcão de atendimento</strong> é o principal ponto de apoio ao público. Localize pela sinalização do evento. <strong>Para qualquer situação especial, encaminhe sempre ao balcão.</strong></div></div>
+  </div>
+
+  <div class="fi" data-cat="atendimento" data-search="telefone contato organização whatsapp ligar responsável suporte">
+    <button class="fq" onclick="tF(this)"><span>O participante pede contato da organização.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Para dúvidas de <strong>inscrição</strong>: WhatsApp <strong>(27) 99271-1043</strong>.<br>Para demais situações: encaminhe ao <strong>balcão de atendimento</strong>.<div class="ab danger">🚫 Nunca divulgue telefones pessoais da equipe.</div></div></div>
+  </div>
+
+  <div class="fi" data-cat="atendimento" data-search="reclamação insatisfação queixa problema sugestão">
+    <button class="fq" onclick="tF(this)"><span>Participante com reclamação ou insatisfação.</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Ouça com empatia, não entre em confronto e encaminhe ao <strong>balcão de atendimento</strong>. Diga: <em>"Vou te encaminhar ao balcão para resolvermos isso."</em></div></div>
+  </div>
+
+  <div class="fi" data-cat="atendimento" data-search="ABRH quem é associação missão o que faz">
+    <button class="fq" onclick="tF(this)"><span>O que é a ABRH-ES?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">A <strong>ABRH-ES</strong> é a Associação Brasileira de Recursos Humanos — seccional Espírito Santo, realizadora do Conexa H.</div></div>
+  </div>
+
+  <div class="fi" data-cat="atendimento" data-search="redes sociais instagram site oficial conexa abrh">
+    <button class="fq" onclick="tF(this)"><span>Qual o Instagram e site oficial do evento?</span><span class="fch">▼</span></button>
+    <div class="fa"><div class="fai">Instagram: <strong>@abrh_es</strong>. Buscar pelo site oficial do Conexa H para informações atualizadas.</div></div>
+  </div>
+
+</div>
+
+</div><!-- mc -->
+
+<footer>
+  <p>Central de Apoio · <span>Conexa H 2026</span> · Uso exclusivo de voluntários</p>
+  <p style="margin-top:4px;">ABRH-ES · Em caso de dúvida operacional, acione a coordenação</p>
+</footer>
+
+</div><!-- #app -->
+
+<script>
+function checkP(){
+  var v=document.getElementById('pInput').value;
+  var e=document.getElementById('lErr');
+  if(v==='voluntarios2026'){
+    document.getElementById('lock').style.display='none';
+    document.getElementById('app').style.display='block';
+    sessionStorage.setItem('cx_auth','1');
+  } else {
+    e.style.display='block';
+    document.getElementById('pInput').value='';
+    document.getElementById('pInput').focus();
+    setTimeout(function(){e.style.display='none';},3000);
+  }
+}
+function toggleP(){
+  var i=document.getElementById('pInput');
+  var b=document.getElementById('tPwd');
+  if(i.type==='password'){i.type='text';b.textContent='🙈';}
+  else{i.type='password';b.textContent='👁️';}
+}
+function tF(b){
+  var a=b.nextElementSibling,o=b.classList.contains('open');
+  if(o){b.classList.remove('open');a.style.maxHeight=null;}
+  else{b.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';}
+}
+function tP(b){
+  var a=b.nextElementSibling,o=b.classList.contains('open');
+  if(o){b.classList.remove('open');a.style.maxHeight=null;}
+  else{b.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';}
+}
+var cf='all';
+function clearS(){
+  document.getElementById('sInput').value='';
+  document.getElementById('sClear').style.display='none';
+  filt();
+  document.getElementById('sInput').focus();
+}
+function filterC(b){
+  document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('active');});
+  b.classList.add('active');
+  cf=b.dataset.cat;
+  filt();
+}
+function filt(){
+  var q=document.getElementById('sInput').value.toLowerCase().trim();
+  var cat=cf;
+  document.getElementById('qs').style.display=q?'none':'';
+  var n=0;
+  document.querySelectorAll('.fi').forEach(function(item){
+    var ic=item.dataset.cat;
+    var sd=(item.dataset.search||'').toLowerCase();
+    var qt=item.querySelector('.fq span')?item.querySelector('.fq span').textContent.toLowerCase():'';
+    var at=item.querySelector('.fai')?item.querySelector('.fai').textContent.toLowerCase():'';
+    var cm=cat==='all'||ic===cat;
+    var sm=!q||sd.includes(q)||qt.includes(q)||at.includes(q);
+    if(cm&&sm){item.classList.remove('hidden');n++;if(q)hl(item,q);else clr(item);}
+    else{item.classList.add('hidden');clr(item);}
+  });
+  document.querySelectorAll('.cb').forEach(function(b){
+    var bc=b.dataset.cat;
+    var bm=cat==='all'||bc===cat;
+    var vi=b.querySelectorAll('.fi:not(.hidden)').length;
+    b.style.display=(bm&&vi>0)?'':'none';
+    var ce=b.querySelector('.cc');
+    if(ce)ce.textContent=vi;
+  });
+  var vb=document.getElementById('volBlock');
+  if(vb)vb.style.display=(cat==='all'||cat==='voluntarios')?'':'none';
+  document.getElementById('nr').style.display=(n===0&&q)?'block':'none';
+  var rc=document.getElementById('rc');
+  if(q){rc.style.display='block';rc.innerHTML='<strong>'+n+'</strong> resultado'+(n!==1?'s':'')+' para "<strong>'+esc(document.getElementById('sInput').value)+'</strong>"';}
+  else{rc.style.display='none';}
+}
+function hl(item,q){
+  var s=item.querySelector('.fq span');
+  if(!s)return;
+  var o=s.dataset.orig||s.textContent;
+  s.dataset.orig=o;
+  var r=new RegExp('('+escR(q)+')','gi');
+  s.innerHTML=o.replace(r,'<mark>$1</mark>');
+}
+function clr(item){
+  var s=item.querySelector('.fq span');
+  if(!s||!s.dataset.orig)return;
+  s.textContent=s.dataset.orig;
+  delete s.dataset.orig;
+}
+function escR(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+document.addEventListener('DOMContentLoaded',function(){
+  if(sessionStorage.getItem('cx_auth')==='1'){
+    document.getElementById('lock').style.display='none';
+    document.getElementById('app').style.display='block';
+  }
+  document.getElementById('pInput').addEventListener('keydown',function(e){
+    if(e.key==='Enter')checkP();
+  });
+  document.getElementById('sInput').addEventListener('input',function(){
+    var q=document.getElementById('sInput').value.trim();
+    document.getElementById('sClear').style.display=q?'block':'none';
+    filt();
+  });
+  document.querySelectorAll('.cb').forEach(function(b){
+    var c=b.querySelectorAll('.fi').length;
+    var e=b.querySelector('.cc');
+    if(e)e.textContent=c;
+  });
+});
+</script>
+</body>
+</html>
